@@ -51,7 +51,8 @@ All settings are optional, with the default being used when no other value is se
 
 Upon building, your React app will be packaged into a static application, and the `functions` will be
 packaged into a `_worker.js` file. Additionally, a `_routes.json` file will also be created to prevent
-the functions from intercepting requests that should go to the frontend.
+the functions from intercepting requests that should go to the frontend. Route file contents are dictated by the
+`allowedApiPaths` and `excludedApiPaths`.
 
 The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler
 
@@ -65,6 +66,9 @@ _If using Hono as your Functions API framework_
 
 Due to the way Hono declares it's own JSX types, situations can occur where they collide with the React types.
 If the 2 code bases don't touch directly, this works fine. However, utilizing something such as Hono's `hc` client
-will cause references between the two to be made, which will cause `tsc` to fail with errors.
+will cause references between the two to be made, which will cause `tsc` to fail with errors when building.
+
+To avoid this, either use some other mechanism(axios, etc) for contacting the Functions API, or don't use `tsc` for
+type-checking.
 
 Right now, I don't know of a way to avoid this.
