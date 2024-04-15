@@ -1,8 +1,8 @@
-import type { Plugin as VitePlugin } from 'vite';
-import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { CloudflareSpaConfig, defaultOptions } from './CloudflareSpaConfig';
-import { makeWranglerFetch, convertWranglerResponse } from './utils';
+import { UnstableDevWorker, unstable_dev } from 'wrangler';
+import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { writeFileSync } from 'fs';
+import type { Plugin as VitePlugin } from 'vite';
 
 let wranglerDevServer: UnstableDevWorker;
 

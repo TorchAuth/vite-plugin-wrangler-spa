@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { splitCookiesString } from 'set-cookie-parser';
-import { UnstableDevWorker } from 'wrangler';
+import type { UnstableDevWorker } from 'wrangler';
 
 /** Convert the NodeJS request into a webworker fetch request */
 export const makeWranglerFetch = (
