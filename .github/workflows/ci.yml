@@ -43,27 +43,27 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-  test-pr:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-          cache: 'npm'
-      - name: Update NPM
-        run: npm install -g npm
-      - name: NPM Install
-        run: npm ci
-      # - name: Run unit tests
-      #   working-directory: ./packages/Schedulely
-      #   run: npx vitest run --coverage
-      # - name: Report Coverage
-      #   if: always()
-      #   uses: davelosert/vitest-coverage-report-action@v2
-      #   with:
-      #     working-directory: './packages/Schedulely'
+  # test-pr:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js 18.x
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18.x
+  #         cache: 'npm'
+  #     - name: Update NPM
+  #       run: npm install -g npm
+  #     - name: NPM Install
+  #       run: npm ci
+  # - name: Run unit tests
+  #   working-directory: ./packages/Schedulely
+  #   run: npx vitest run --coverage
+  # - name: Report Coverage
+  #   if: always()
+  #   uses: davelosert/vitest-coverage-report-action@v2
+  #   with:
+  #     working-directory: './packages/Schedulely'
