@@ -4,6 +4,11 @@
   "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bruceharrison1984/vite-wrangler-spa"
+  },
+  "homepage": "https://github.com/bruceharrison1984/vite-wrangler-spa",
   "files": [
     "dist"
   ],
