@@ -8,7 +8,7 @@ let wranglerDevServer: UnstableDevWorker;
 
 export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
   const {
-    functionEntrypoint: wranglerCodeRoot,
+    functionEntrypoint,
     wranglerConfig,
     allowedApiPaths,
     excludedApiPaths,
@@ -17,13 +17,13 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
     ...config,
   };
   const plugin: VitePlugin = {
-    name: 'vite-cloudflare-jamstack',
+    name: 'vite-wrangler-spa',
 
     /** Start the wrangler miniflare server */
     configureServer: async (devServer) => {
       if (!wranglerDevServer) {
         wranglerDevServer = await unstable_dev(
-          wranglerCodeRoot!,
+          functionEntrypoint!,
           wranglerConfig
         );
       }
@@ -56,7 +56,7 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
 
     // /** Send HMR message to browser to reload page and emit message whenever Functions file changes */
     async handleHotUpdate(ctx) {
-      if (ctx.file.includes(wranglerCodeRoot!.split('/')[0]))
+      if (ctx.file.includes(functionEntrypoint!.split('/')[0]))
         ctx.server.hot.send({
           type: 'custom',
           event: 'function-update',
@@ -69,7 +69,7 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
       options.preserveEntrySignatures = 'allow-extension';
       options.input = {
         ['app']: options.input as string,
-        ['api']: wranglerCodeRoot!,
+        ['api']: functionEntrypoint!,
       };
     },
 
