@@ -23,7 +23,7 @@ _By default we use Hono as the router, but any other Cloudflare Functions compat
 API endpoints are ran via Pages Functions. Cloudflare services should be available on the Context object with the router.
 
 ```ts
-const app = new Hono().basePath("/api");
+const app = new Hono().basePath('/api');
 
 const route = app.get((c) => {
   // Hono's context.env property will contain references to any services bound to the Pages
@@ -34,6 +34,18 @@ const route = app.get((c) => {
   });
 });
 ```
+
+## Vite Plugin Configuration
+
+All settings are optional, with the default being used when no other value is set.
+
+| Name               |                                                   Description                                                    |                    Default |
+| ------------------ | :--------------------------------------------------------------------------------------------------------------: | -------------------------: |
+| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                `["/api/*]` |
+| excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                       `[]` |
+| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |       `functions/index.ts` |
+| wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
+| wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
 
 ## Build
 
