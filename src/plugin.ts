@@ -44,6 +44,7 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
         ) {
           const resp = await makeWranglerFetch(req, wranglerDevServer);
 
+          // @ts-expect-error webworker Response/Request types collide with NodeJs types
           convertWranglerResponse(resp, res);
           return res;
         }
