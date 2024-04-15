@@ -7,15 +7,6 @@
     "esModuleInterop": true,
     "strict": true,
     "declaration": true,
-    "types": ["node"],
-
-    "useDefineForClassFields": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "allowImportingTsExtensions": true
+    "types": ["node"]
   }
 }
