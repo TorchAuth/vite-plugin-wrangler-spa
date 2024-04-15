@@ -1,13 +1,13 @@
 # vite-wrangler-spa
 
-This vite-plugin can be used to render a full Cloudflare jamstack locally.
+This plugin allows both the React SPA and Cloudflare functions to run with LiveReload locally, and at the same time.
 
 This solves a major pain point that currently exists, where you cannot work locally with LiveReload
 for the React project, you are forced to use `preview`. This plugin allows both the React SPA and
 Cloudflare functions to run with LiveReload locally, and at the same time.
 
 - Write React code the same as any other Vite project, with LiveReload
-- Cloudflare function code can be written within the `functions` directory
+- Cloudflare function code can be written within the configurable `functions` directory
   - This is served in parallel via `miniflare` along with the React SPA code
 - Make requests from the React project to the `miniflare` endpoints
 - Full access to Cloudflare local services via `wrangler` configuration
@@ -16,7 +16,7 @@ Cloudflare functions to run with LiveReload locally, and at the same time.
   - KV
   - etc
 
-## API Endpoint
+## API Endpoints
 
 _By default we use Hono as the router, but any other Cloudflare Functions compatible router could be used as well._
 
@@ -36,6 +36,16 @@ const route = app.get((c) => {
 ```
 
 Any updates to the API will trigger a full refresh in the browser window, as well as print a console message.
+
+You can also return HTML directly to facilitate HTMX applications:
+
+```ts
+const app = new Hono().basePath('/api');
+
+const route = app.get((c) => {
+  return c.html(<div>My HTMX content!</div>);
+});
+```
 
 ## Vite Plugin Configuration
 
@@ -62,7 +72,7 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 > npx wrangler pages deploy ./dist
 ```
 
-### Hono Type Problems
+## Hono Type Problems
 
 _If using Hono as your Functions API framework_
 
