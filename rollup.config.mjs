@@ -6,7 +6,7 @@ const options = defineConfig({
   input: 'src/index.ts',
   output: {
     dir: 'dist',
-    format: 'es',
+    format: 'esm',
   },
   external: ['wrangler', 'vite', 'fs', 'node:stream', 'set-cookie-parser'],
   plugins: [
