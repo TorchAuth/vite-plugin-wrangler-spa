@@ -2,7 +2,8 @@
   "name": "vite-wrangler-spa",
   "version": "1.0.0",
   "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
-  "main": "index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "rollup": "rollup -c"
   },

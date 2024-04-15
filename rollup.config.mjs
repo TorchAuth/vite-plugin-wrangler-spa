@@ -12,8 +12,8 @@ const options = defineConfig({
   plugins: [
     copy({
       targets: [
-        { src: "../../README.md", dest: "./" },
-        { src: "../../LICENSE", dest: "./" },
+        { src: "./README.md", dest: "./dist" },
+        { src: "./LICENSE", dest: "./dist" },
       ],
     }),
     ts({

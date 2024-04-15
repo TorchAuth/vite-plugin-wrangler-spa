@@ -1,7 +1,7 @@
-import { IncomingMessage, ServerResponse } from "node:http";
-import { Readable } from "node:stream";
-import { splitCookiesString } from "set-cookie-parser";
-import { UnstableDevWorker } from "wrangler";
+import { IncomingMessage, ServerResponse } from 'node:http';
+import { Readable } from 'node:stream';
+import { splitCookiesString } from 'set-cookie-parser';
+import { UnstableDevWorker } from 'wrangler';
 
 /** Convert the NodeJS request into a webworker fetch request */
 export const makeWranglerFetch = (
@@ -18,12 +18,12 @@ export const makeWranglerFetch = (
     }
   }
 
-  if (method !== "GET" && method !== "HEAD") {
+  if (method !== 'GET' && method !== 'HEAD') {
     return wranglerDevServer.fetch(url, {
       headers,
       method,
       body: Readable.toWeb(req),
-      duplex: "half",
+      duplex: 'half',
     });
   }
 
@@ -41,13 +41,13 @@ export const convertWranglerResponse = (
   const headers = Object.fromEntries(wranglerResponse.headers);
   let cookies: string[] = [];
 
-  if (wranglerResponse.headers.has("set-cookie")) {
-    const header = wranglerResponse.headers.get("set-cookie")!;
+  if (wranglerResponse.headers.has('set-cookie')) {
+    const header = wranglerResponse.headers.get('set-cookie')!;
     const split = splitCookiesString(header);
     cookies = split;
   }
 
-  res.writeHead(wranglerResponse.status, { ...headers, "set-cookie": cookies });
+  res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies });
 
   if (!wranglerResponse.body) {
     res.end();
@@ -56,7 +56,7 @@ export const convertWranglerResponse = (
 
   if (wranglerResponse.body.locked) {
     res.write(
-      "Fatal error: Response body is locked. " +
+      'Fatal error: Response body is locked. ' +
         `This can happen when the response was already read (for example through 'response.json()' or 'response.text()').`
     );
     res.end();
@@ -71,8 +71,8 @@ export const convertWranglerResponse = (
   }
 
   const cancel = (error?: Error) => {
-    res.off("close", cancel);
-    res.off("error", cancel);
+    res.off('close', cancel);
+    res.off('error', cancel);
 
     // If the reader has already been interrupted with an error earlier,
     // then it will appear here, it is useless, but it needs to be catch.
@@ -80,8 +80,8 @@ export const convertWranglerResponse = (
     if (error) res.destroy(error);
   };
 
-  res.on("close", cancel);
-  res.on("error", cancel);
+  res.on('close', cancel);
+  res.on('error', cancel);
 
   next();
   async function next() {
@@ -92,7 +92,7 @@ export const convertWranglerResponse = (
         if (done) break;
 
         if (!res.write(value)) {
-          res.once("drain", next);
+          res.once('drain', next);
           return;
         }
       }

@@ -1,4 +1,4 @@
-import { UnstableDevOptions } from "wrangler";
+import { UnstableDevOptions } from 'wrangler';
 
 export type CloudflareSpaConfig = {
   /**
@@ -52,17 +52,17 @@ export type CloudflareSpaConfig = {
 };
 
 export const defaultOptions: CloudflareSpaConfig = {
-  allowedApiPaths: ["/api/*"],
+  allowedApiPaths: ['/api/*'],
   excludedApiPaths: [],
-  functionEntrypoint: "functions/index.ts",
+  functionEntrypoint: 'functions/index.ts',
   wranglerConfig: {
-    moduleRoot: "functions",
-    logLevel: "log",
+    moduleRoot: 'functions',
+    logLevel: 'log',
     experimental: {
       disableExperimentalWarning: true,
       watch: true,
       testMode: false, // watch only works if testMode is false
     },
   },
-  wranglerConfigPath: "wrangler.toml",
+  wranglerConfigPath: 'wrangler.toml',
 };

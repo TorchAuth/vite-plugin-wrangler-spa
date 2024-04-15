@@ -1,2 +1,2 @@
-export type { CloudflareSpaConfig } from "./CloudflareSpaConfig";
-export { viteWranglerSpa } from "./plugin";
+export type { CloudflareSpaConfig } from './CloudflareSpaConfig';
+export { viteWranglerSpa } from './plugin';

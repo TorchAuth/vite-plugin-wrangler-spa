@@ -1,8 +1,8 @@
-import type { Plugin as VitePlugin } from "vite";
-import { UnstableDevWorker, unstable_dev } from "wrangler";
-import { CloudflareSpaConfig, defaultOptions } from "./CloudflareSpaConfig";
-import { makeWranglerFetch, convertWranglerResponse } from "./utils";
-import { writeFileSync } from "fs";
+import type { Plugin as VitePlugin } from 'vite';
+import { UnstableDevWorker, unstable_dev } from 'wrangler';
+import { CloudflareSpaConfig, defaultOptions } from './CloudflareSpaConfig';
+import { makeWranglerFetch, convertWranglerResponse } from './utils';
+import { writeFileSync } from 'fs';
 
 let wranglerDevServer: UnstableDevWorker;
 
@@ -17,7 +17,7 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
     ...config,
   };
   const plugin: VitePlugin = {
-    name: "vite-cloudflare-jamstack",
+    name: 'vite-cloudflare-jamstack',
 
     /** Start the wrangler miniflare server */
     configureServer: async (devServer) => {
@@ -31,20 +31,19 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
       //setup middleware to redirect requests to miniflare
       devServer.middlewares.use(async (req, res, next) => {
         const { url } = req;
-        if (url === undefined) throw new Error("url is undefined!");
+        if (url === undefined) throw new Error('url is undefined!');
 
         /** only direct specific requests to the miniflare server so the SPA still renders correctly */
         if (
           allowedApiPaths?.find((x) =>
-            new RegExp(`${x.replace("*", "")}`).test(url)
+            new RegExp(`${x.replace('*', '')}`).test(url)
           ) &&
           !excludedApiPaths?.find((x) =>
-            new RegExp(`${x.replace("*", "")}`).test(url)
+            new RegExp(`${x.replace('*', '')}`).test(url)
           ) // TODO: is this correct?
         ) {
           const resp = await makeWranglerFetch(req, wranglerDevServer);
 
-          // @ts-expect-error webworker Response/Request types collide with NodeJs types
           convertWranglerResponse(resp, res);
           return res;
         }
@@ -56,30 +55,30 @@ export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
 
     // /** Send HMR message to browser to reload page and emit message whenever Functions file changes */
     async handleHotUpdate(ctx) {
-      if (ctx.file.includes(wranglerCodeRoot!.split("/")[0]))
+      if (ctx.file.includes(wranglerCodeRoot!.split('/')[0]))
         ctx.server.hot.send({
-          type: "custom",
-          event: "function-update",
+          type: 'custom',
+          event: 'function-update',
           data: { file: ctx.file },
         });
     },
 
     // Add the functions directory as another entrypoint
     options(options) {
-      options.preserveEntrySignatures = "allow-extension";
+      options.preserveEntrySignatures = 'allow-extension';
       options.input = {
-        ["app"]: options.input as string,
-        ["api"]: wranglerCodeRoot!,
+        ['app']: options.input as string,
+        ['api']: wranglerCodeRoot!,
       };
     },
 
     /** setup listener on dev mode page */
     transformIndexHtml: {
-      order: "pre",
+      order: 'pre',
       handler: () => [
         {
-          tag: "script",
-          attrs: { type: "module" },
+          tag: 'script',
+          attrs: { type: 'module' },
           children: `
 if (import.meta.hot) {
   let outputColor = "color:cyan; font-weight:bold;"
@@ -96,13 +95,13 @@ if (import.meta.hot) {
     /** Worker file must be named _worker.js and located in the root in order for Cloudflare to use it */
     outputOptions(options) {
       options.entryFileNames = (chunk) =>
-        chunk.name === "api" ? "_worker.js" : `${chunk.name}-[hash].js`;
+        chunk.name === 'api' ? '_worker.js' : `${chunk.name}-[hash].js`;
     },
 
     /** Create a _routes file to avoid functions from firing on all routes and intercepting SPA traffic */
     writeBundle() {
       writeFileSync(
-        "dist/_routes.json",
+        'dist/_routes.json',
         JSON.stringify(
           {
             version: 1,
