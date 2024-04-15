@@ -1,0 +1,21 @@
+{
+  "name": "vite-wrangler-spa",
+  "version": "1.0.0",
+  "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bruce Harrison",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/set-cookie-parser": "^2.4.7",
+    "eslint": "^9.0.0",
+    "prettier": "^3.2.5",
+    "set-cookie-parser": "^2.6.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.8",
+    "wrangler": "^3.50.0"
+  }
+}
