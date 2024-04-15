@@ -6,7 +6,7 @@ import { writeFileSync } from "fs";
 
 let wranglerDevServer: UnstableDevWorker;
 
-export function wrangler(config?: CloudflareSpaConfig): VitePlugin {
+export function viteWranglerSpa(config?: CloudflareSpaConfig): VitePlugin {
   const {
     functionEntrypoint: wranglerCodeRoot,
     wranglerConfig,

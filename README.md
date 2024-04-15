@@ -18,8 +18,9 @@ Cloudflare functions to run with LiveReload locally.
 
 ## API Endpoint
 
-API endpoints are ran via Pages Functions. By default we use Hono as the Router, but any other Cloudflare Functions
-compatible router could be used as well. Cloudflare services should be available on the Context object with the router.
+_By default we use Hono as the router, but any other Cloudflare Functions compatible router could be used as well._
+
+API endpoints are ran via Pages Functions. Cloudflare services should be available on the Context object with the router.
 
 ```ts
 const app = new Hono().basePath("/api");
@@ -46,7 +47,9 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 > npx wrangler pages deploy ./dist
 ```
 
-## Type Problems
+### Hono Type Problems
+
+_If using Hono as your Functions API framework_
 
 Due to the way Hono declares it's own JSX types, situations can occur where they collide with the React types.
 If the 2 code bases don't touch directly, this works fine. However, utilizing something such as Hono's `hc` client
