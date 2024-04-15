@@ -4,7 +4,7 @@ This vite-plugin can be used to render a full Cloudflare jamstack locally.
 
 This solves a major pain point that currently exists, where you cannot work locally with LiveReload
 for the React project, you are forced to use `preview`. This plugin allows both the React SPA and
-Cloudflare functions to run with LiveReload locally.
+Cloudflare functions to run with LiveReload locally, and at the same time.
 
 - Write React code the same as any other Vite project, with LiveReload
 - Cloudflare function code can be written within the `functions` directory
@@ -34,6 +34,8 @@ const route = app.get((c) => {
   });
 });
 ```
+
+Any updates to the API will trigger a full refresh in the browser window, as well as print a console message.
 
 ## Vite Plugin Configuration
 
