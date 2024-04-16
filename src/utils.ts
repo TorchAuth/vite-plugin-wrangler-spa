@@ -1,13 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { splitCookiesString } from 'set-cookie-parser';
+import type { Response } from 'undici';
 import type { UnstableDevWorker } from 'wrangler';
 
 /** Convert the NodeJS request into a webworker fetch request */
 export const makeWranglerFetch = (
   req: IncomingMessage,
   wranglerDevServer: UnstableDevWorker
-) => {
+): Promise<Response> => {
   const { rawHeaders, method, url } = req;
 
   const headers: Record<string, string> = {};
@@ -24,13 +25,13 @@ export const makeWranglerFetch = (
       method,
       body: Readable.toWeb(req),
       duplex: 'half',
-    }) as unknown as Promise<Response>;
+    });
   }
 
   return wranglerDevServer.fetch(url, {
     headers,
     method,
-  }) as unknown as Promise<Response>;
+  });
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
