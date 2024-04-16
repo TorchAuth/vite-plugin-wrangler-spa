@@ -1,20 +1,29 @@
 {
   "name": "vite-wrangler-spa",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
+  "author": "Bruce Harrison",
+  "license": "MIT",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/bruceharrison1984/vite-wrangler-spa"
   },
   "homepage": "https://github.com/bruceharrison1984/vite-wrangler-spa",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "rollup -c",
-    "lint": "eslint . --ext .ts --ext .tsx"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "keywords": [
     "cloudflare",
@@ -22,8 +31,10 @@
     "functions",
     "vite"
   ],
-  "author": "Bruce Harrison",
-  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint . --ext .ts --ext .tsx"
+  },
   "devDependencies": {
     "@swc/core": "^1.4.14",
     "@types/node": "^20.12.7",
@@ -36,7 +47,6 @@
     "rollup": "^4.14.3",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-ts": "^3.4.5",
-    "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },
   "peerDependencies": {

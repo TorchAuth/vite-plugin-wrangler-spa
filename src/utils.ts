@@ -24,13 +24,13 @@ export const makeWranglerFetch = (
       method,
       body: Readable.toWeb(req),
       duplex: 'half',
-    });
+    }) as unknown as Promise<Response>;
   }
 
   return wranglerDevServer.fetch(url, {
     headers,
     method,
-  });
+  }) as unknown as Promise<Response>;
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
