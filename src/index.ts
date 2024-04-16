@@ -1,7 +1,7 @@
 import { CloudflareSpaConfig, defaultOptions } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
-import { writeFileSync } from 'fs';
+import { writeFileSync } from 'node:fs';
 import type { Plugin as VitePlugin } from 'vite';
 
 let wranglerDevServer: UnstableDevWorker;
@@ -9,6 +9,7 @@ let wranglerDevServer: UnstableDevWorker;
 export default function viteWranglerSpa(
   config?: CloudflareSpaConfig
 ): VitePlugin[] {
+  // config merging could be more granular so nested defaults aren't immediately lost
   const {
     functionEntrypoint,
     wranglerConfig,
