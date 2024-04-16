@@ -4,7 +4,7 @@ import { splitCookiesString } from 'set-cookie-parser';
 import type { UnstableDevWorker } from 'wrangler';
 
 // undici types are required to avoid collision between node `Response` and fetch `Response`
-import type { Response } from 'undici';
+import type { RequestInit, Response } from 'undici';
 
 /** Convert the NodeJS request into a webworker fetch request */
 export const makeWranglerFetch = (
@@ -21,19 +21,17 @@ export const makeWranglerFetch = (
     }
   }
 
-  if (method !== 'GET' && method !== 'HEAD') {
-    return wranglerDevServer.fetch(url, {
-      headers,
-      method,
-      body: Readable.toWeb(req),
-      duplex: 'half',
-    });
-  }
-
-  return wranglerDevServer.fetch(url, {
+  const wranglerReq: Omit<RequestInit, 'dispatcher'> = {
     headers,
     method,
-  });
+  };
+
+  if (['GET', 'HEAD'].includes(method!.toUpperCase())) {
+    wranglerReq.body = Readable.toWeb(req);
+    wranglerReq.duplex = 'half';
+  }
+
+  return wranglerDevServer.fetch(url, wranglerReq);
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
