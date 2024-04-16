@@ -1,8 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { splitCookiesString } from 'set-cookie-parser';
-import type { Response } from 'undici';
 import type { UnstableDevWorker } from 'wrangler';
+
+// undici types are required to avoid collision between node `Response` and fetch `Response`
+import type { Response } from 'undici';
 
 /** Convert the NodeJS request into a webworker fetch request */
 export const makeWranglerFetch = (
