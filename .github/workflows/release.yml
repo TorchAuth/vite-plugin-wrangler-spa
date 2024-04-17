@@ -43,16 +43,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # - name: Test
-      #   run: npm run test
-
       - name: Build
         run: npm run build
-
-      # - name: Upload documentation artifact
-      #   uses: actions/upload-pages-artifact@v2
-      #   with:
-      #     path: ./apps/schedulely-docs/dist
 
       - name: Upload vite-wrangler-spa package artifact
         uses: actions/upload-artifact@v3
