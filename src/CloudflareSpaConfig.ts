@@ -50,19 +50,3 @@ export type CloudflareSpaConfig = {
    */
   wranglerConfigPath?: string;
 };
-
-export const defaultOptions: CloudflareSpaConfig = {
-  allowedApiPaths: ['/api/*'],
-  excludedApiPaths: [],
-  functionEntrypoint: 'functions/index.ts',
-  wranglerConfig: {
-    moduleRoot: 'functions',
-    logLevel: 'log',
-    experimental: {
-      disableExperimentalWarning: true,
-      watch: true,
-      testMode: false, // watch only works if testMode is false
-    },
-  },
-  wranglerConfigPath: 'wrangler.toml',
-};

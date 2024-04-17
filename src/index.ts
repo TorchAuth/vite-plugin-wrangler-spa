@@ -1,4 +1,4 @@
-import { CloudflareSpaConfig, defaultOptions } from './CloudflareSpaConfig';
+import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { writeFileSync } from 'node:fs';
@@ -9,16 +9,18 @@ let wranglerDevServer: UnstableDevWorker;
 export default function viteWranglerSpa(
   config?: CloudflareSpaConfig
 ): VitePlugin[] {
-  // config merging could be more granular so nested defaults aren't immediately lost
-  const {
-    functionEntrypoint,
-    wranglerConfig,
-    allowedApiPaths,
-    excludedApiPaths,
-  } = {
-    ...defaultOptions,
-    ...config,
+  const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
+  const wranglerConfig = config?.wranglerConfig || {
+    logLevel: 'log',
   };
+  // force these settings so HMR works
+  wranglerConfig.experimental = {
+    liveReload: true,
+    testMode: false,
+    disableExperimentalWarning: true, //disable because it's annoying
+  };
+  const allowedApiPaths = config?.allowedApiPaths || ['/api/*'];
+  const excludedApiPaths = config?.allowedApiPaths || [];
 
   return [
     {
@@ -69,6 +71,7 @@ export default function viteWranglerSpa(
       },
 
       // Add the functions directory as another entrypoint
+      // Is there a better way to do this?
       options(options) {
         options.preserveEntrySignatures = 'allow-extension';
         options.input = {
