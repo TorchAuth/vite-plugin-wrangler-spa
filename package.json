@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "lint": "eslint . --ext .ts --ext .tsx"
+    "lint": "eslint src --ext .ts"
   },
   "devDependencies": {
     "@swc/core": "^1.4.14",
