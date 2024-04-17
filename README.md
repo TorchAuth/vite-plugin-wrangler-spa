@@ -16,6 +16,77 @@ Cloudflare functions to run with LiveReload locally, and at the same time.
   - KV
   - etc
 
+## Usage
+
+_A detailed example can be found in the `examples` directory, but a brief overview of installing and configuring this plugin is as follows_
+
+This plugin is intended to be used with a standard Vite React application, though other SPA frameworks may also work.
+
+```sh
+## Create a new Vite React application
+> create vite@latest my-react-app -- --template react-swc-ts
+> cd my-react-app
+
+## Create folder to hold Cloudflare Pages Functions code
+> mkdir functions
+
+## Install vite-wrangler-spa
+> npm i -D vite-wrangler-spa
+
+## Install Hono
+> npm i hono
+```
+
+Alter your `vite.config.ts` file to include this plugin:
+
+```ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import viteWranglerSpa from 'vite-wrangler-spa';
+
+export default defineConfig({
+  build: {
+    minify: false,
+  },
+  plugins: [react(), viteWranglerSpa()],
+});
+```
+
+Add an `index.ts` file to the `functions` directory:
+
+```ts
+import { Hono } from 'hono';
+
+const app = new Hono().basePath('/api');
+
+const route = app.get((c) => {
+  return c.json({
+    test: true,
+  });
+});
+
+export type AppType = typeof route;
+
+export default app;
+```
+
+Add a `tsconfig.json` file to the `functions` directory to fix type issues:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "lib": ["ESNext"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "types": ["hono"]
+  }
+}
+```
+
 ## API Endpoints
 
 _By default we use Hono as the router, but any other Cloudflare Functions compatible router could be used as well._
