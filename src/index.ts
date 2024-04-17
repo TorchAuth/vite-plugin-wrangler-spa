@@ -87,9 +87,8 @@ export default function viteWranglerSpa(
             children: `
 if (import.meta.hot) {
   let outputColor = "color:cyan; font-weight:bold;"
-  console.log("%c ⚙️ Cloudflare Pages Functions HMR active!", outputColor);
   import.meta.hot.on('function-update', (data) => {
-    console.log(\`%c ⚙️ Function update detected in file: '\${data.file}'\`, outputColor)
+    console.log(\`%c 🔥 Cloudflare Pages Function - update detected in file: '\${data.file}'\`, outputColor);
     location.reload(true);
   }); 
 }`,

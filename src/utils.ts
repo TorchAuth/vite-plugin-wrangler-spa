@@ -26,7 +26,7 @@ export const makeWranglerFetch = (
     method,
   };
 
-  if (['GET', 'HEAD'].includes(method!.toUpperCase())) {
+  if (!['GET', 'HEAD'].includes(method!.toUpperCase())) {
     wranglerReq.body = Readable.toWeb(req);
     wranglerReq.duplex = 'half';
   }
