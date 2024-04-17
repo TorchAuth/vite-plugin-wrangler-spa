@@ -9,6 +9,7 @@ Cloudflare functions to run with LiveReload locally, and at the same time.
 - Write React code the same as any other Vite project, with LiveReload
 - Cloudflare function code can be written within the configurable `functions` directory
   - This is served in parallel via `miniflare` along with the React SPA code
+  - [Hono](https://hono.dev/top) is the preferred router, but any Cloudflare compatible router could also be used
 - Make requests from the React project to the `miniflare` endpoints
 - Full access to Cloudflare local services via `wrangler` configuration
   - D1
@@ -89,7 +90,7 @@ Add a `tsconfig.json` file to the `functions` directory to fix type issues:
 
 ## API Endpoints
 
-_By default we use Hono as the router, but any other Cloudflare Functions compatible router could be used as well._
+_By default we use [Hono](https://hono.dev/top) as the router, but any other Cloudflare Functions compatible router could be used as well._
 
 API endpoints are ran via Pages Functions. Cloudflare services should be available on the Context object with the router.
 
