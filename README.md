@@ -96,7 +96,7 @@ API endpoints are ran via Pages Functions. Cloudflare services should be availab
 ```ts
 const app = new Hono().basePath('/api');
 
-const route = app.get((c) => {
+const route = app.get('/hello', (c) => {
   // Hono's context.env property will contain references to any services bound to the Pages
   console.log(c.env);
 
@@ -113,7 +113,7 @@ You can also return HTML directly to facilitate HTMX applications:
 ```ts
 const app = new Hono().basePath('/api');
 
-const route = app.get((c) => {
+const route = app.get('/page', (c) => {
   return c.html(<div>My HTMX content!</div>);
 });
 ```
