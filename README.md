@@ -118,6 +118,25 @@ const route = app.get((c) => {
 });
 ```
 
+You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA.
+See the [Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
+
+```ts
+//App.tsx
+const [remote, setRemote] = useState<string | undefined>(undefined);
+
+useEffect(() => {
+  async function fetchStuff() {
+    const resp = await hc<AppType>('').api.hello.$get({
+      query: { name: 'test' },
+    });
+    setRemote(await resp.text());
+  }
+
+  fetchStuff();
+}, []);
+```
+
 ## Vite Plugin Configuration
 
 All settings are optional, with the default being used when no other value is set.
@@ -151,7 +170,4 @@ Due to the way Hono declares it's own JSX types, situations can occur where they
 If the 2 code bases don't touch directly, this works fine. However, utilizing something such as Hono's `hc` client
 will cause references between the two to be made, which will cause `tsc` to fail with errors when building.
 
-To avoid this, either use some other mechanism(axios, etc) for contacting the Functions API, or don't use `tsc` for
-type-checking.
-
-Right now, I don't know of a way to avoid this.
+To avoid this, a separate `tsconfig.json` file must be placed in the `functions` directory. See the React example for guidance.
