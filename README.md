@@ -1,6 +1,6 @@
 # vite-wrangler-spa
 
-![NPM Version](https://img.shields.io/npm/v/vite-wrangler-spa)
+[![NPM Version](https://img.shields.io/npm/v/vite-wrangler-spa)](https://www.npmjs.com/package/vite-wrangler-spa)
 
 This plugin allows both the React SPA and Cloudflare functions to run with LiveReload locally, and at the same time.
 
