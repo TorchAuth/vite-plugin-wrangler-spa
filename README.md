@@ -150,16 +150,17 @@ All settings are optional, with the default being used when no other value is se
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
 | wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
 
-## Build
+## Build & Deploy to Cloudflare
 
-Upon building, your React app will be packaged into a static application, and the `functions` will be
-packaged into a `_worker.js` file. Additionally, a `_routes.json` file will also be created to prevent
-the functions from intercepting requests that should go to the frontend. Route file contents are dictated by the
-`allowedApiPaths` and `excludedApiPaths`.
+Upon building, the final artifact is ready to be deployed. Your React app will be packaged as normal and the `functions` code will be packaged into a `_worker.js` file.
 
-The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler
+Additionally, a `_routes.json` file will also be created to prevent the functions from intercepting requests that should go to the frontend.
+Route file contents are dictated by the `allowedApiPaths` and `excludedApiPaths` configuration options.
+
+The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler, CI/CD, or the UI.
 
 ```sh
+## Upload via wrangler
 > npx wrangler pages deploy ./dist
 ```
 
@@ -169,6 +170,8 @@ _If using Hono as your Functions API framework_
 
 Due to the way Hono declares it's own JSX types, situations can occur where they collide with the React types.
 If the 2 code bases don't touch directly, this works fine. However, utilizing something such as Hono's `hc` client
-will cause references between the two to be made, which will cause `tsc` to fail with errors when building.
+will cause references between the two to be made, which can cause `tsc` to fail with errors when building.
 
 To avoid this, a separate `tsconfig.json` file must be placed in the `functions` directory. See the React example for guidance.
+
+This also can cause some shared bundles to be created. This is a known issue, and if it causes problems please open an issue.
