@@ -1,14 +1,14 @@
-import { zValidator } from "@hono/zod-validator";
-import { Hono } from "hono";
-import { z } from "zod";
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import { z } from 'zod';
 
-const app = new Hono().basePath("/api");
+const app = new Hono().basePath('/api');
 
 const route = app
   .get(
-    "/hello",
+    '/hello',
     zValidator(
-      "query",
+      'query',
       z.object({
         name: z.string(),
       })
@@ -19,7 +19,7 @@ const route = app
       });
     }
   )
-  .get("/page", (c) => {
+  .get('/page', (c) => {
     return c.html(
       <html>
         <body>
