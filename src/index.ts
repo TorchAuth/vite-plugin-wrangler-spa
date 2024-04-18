@@ -35,20 +35,23 @@ export default function viteWranglerSpa(
           );
         }
 
+        console.log('TEST!!!');
+
         //setup middleware to redirect requests to miniflare
         devServer.middlewares.use(async (req, res, next) => {
           const { url } = req;
           if (url === undefined) throw new Error('url is undefined!');
 
+          console.log(url);
+
           /** only direct specific requests to the miniflare server so the SPA still renders correctly */
+          // TODO: exclusions are messed up
           if (
             allowedApiPaths?.find((x) =>
               new RegExp(`${x.replace('*', '')}`).test(url)
-            ) &&
-            !excludedApiPaths?.find((x) =>
-              new RegExp(`${x.replace('*', '')}`).test(url)
-            ) // TODO: is this correct?
+            )
           ) {
+            console.log(url);
             const resp = await makeWranglerFetch(req, wranglerDevServer);
 
             convertWranglerResponse(resp, res);
