@@ -2,13 +2,13 @@ import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { writeFileSync } from 'node:fs';
-import type { Plugin as VitePlugin } from 'vite';
+import type { Plugin, PluginOption } from 'vite';
 
 let wranglerDevServer: UnstableDevWorker;
 
 export default function viteWranglerSpa(
   config?: CloudflareSpaConfig
-): VitePlugin[] {
+): PluginOption[] {
   const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
   const wranglerConfig = config?.wranglerConfig || {
     logLevel: 'log',
@@ -117,6 +117,6 @@ if (import.meta.hot) {
           )
         );
       },
-    } as VitePlugin,
+    } as Plugin,
   ];
 }
