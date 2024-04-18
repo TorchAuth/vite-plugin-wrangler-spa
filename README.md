@@ -152,6 +152,19 @@ All settings are optional, with the default being used when no other value is se
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
 | wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
 
+### Allowed/Excluded Api Paths
+
+**Excluded api paths take precedence over allowed api paths**
+
+| Path           |               Result                |
+| -------------- | :---------------------------------: |
+| `/some`        |             exact match             |
+| `/some/*`      |   match all routes with `/some/`    |
+| `/some/path`   |             exact match             |
+| `/some/path/*` | match all routes with `/some/path/` |
+
+Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`) as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will not work correctly once deployed to Cloudflare. [See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
+
 ## Build & Deploy to Cloudflare
 
 Upon building, the final artifact is ready to be deployed. Your React app will be packaged as normal and the `functions` code will be packaged into a `_worker.js` file.

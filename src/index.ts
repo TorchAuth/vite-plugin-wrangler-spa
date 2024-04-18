@@ -20,7 +20,7 @@ export default function viteWranglerSpa(
     disableExperimentalWarning: true, //disable because it's annoying
   };
   const allowedApiPaths = config?.allowedApiPaths || ['/api/*'];
-  const excludedApiPaths = config?.allowedApiPaths || [];
+  const excludedApiPaths = config?.excludedApiPaths || [];
 
   return [
     {
@@ -30,27 +30,21 @@ export default function viteWranglerSpa(
       configureServer: async (devServer) => {
         if (!wranglerDevServer) {
           wranglerDevServer = await unstable_dev(
-            functionEntrypoint!,
+            functionEntrypoint,
             wranglerConfig
           );
         }
-
-        console.log('TEST!!!');
 
         //setup middleware to redirect requests to miniflare
         devServer.middlewares.use(async (req, res, next) => {
           const { url } = req;
           if (url === undefined) throw new Error('url is undefined!');
 
-          console.log(url);
+          if (excludedApiPaths.find((x) => new RegExp(x).test(url)))
+            return next();
 
           /** only direct specific requests to the miniflare server so the SPA still renders correctly */
-          // TODO: exclusions are messed up
-          if (
-            allowedApiPaths?.find((x) =>
-              new RegExp(`${x.replace('*', '')}`).test(url)
-            )
-          ) {
+          if (allowedApiPaths.find((x) => new RegExp(x).test(url))) {
             console.log(url);
             const resp = await makeWranglerFetch(req, wranglerDevServer);
 
@@ -65,7 +59,7 @@ export default function viteWranglerSpa(
 
       // /** Send HMR message to browser to reload page and emit message whenever Functions file changes */
       async handleHotUpdate(ctx) {
-        if (ctx.file.includes(functionEntrypoint!.split('/')[0]))
+        if (ctx.file.includes(functionEntrypoint.split('/')[0]))
           ctx.server.hot.send({
             type: 'custom',
             event: 'function-update',
