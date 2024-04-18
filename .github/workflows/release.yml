@@ -69,6 +69,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vite-wrangler-spa
+          path: dist
       - run: ls -lha
       # - name: Publish to NPM
       #   run: npm publish --access public
