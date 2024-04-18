@@ -1,5 +1,4 @@
 import { defineConfig } from 'rollup';
-import copy from 'rollup-plugin-copy';
 import ts from 'rollup-plugin-ts';
 
 const options = defineConfig({
@@ -9,15 +8,7 @@ const options = defineConfig({
     format: 'esm',
   },
   external: ['wrangler', 'vite', 'node:fs', 'node:stream', 'set-cookie-parser'],
-  plugins: [
-    copy({
-      targets: [
-        { src: './README.md', dest: './dist' },
-        { src: './LICENSE', dest: './dist' },
-      ],
-    }),
-    ts(),
-  ],
+  plugins: [ts()],
 });
 
 export default options;
