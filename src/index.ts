@@ -8,7 +8,7 @@ let wranglerDevServer: UnstableDevWorker;
 
 export default function viteWranglerSpa(
   config?: CloudflareSpaConfig
-): PluginOption[] {
+): PluginOption {
   const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
   const wranglerConfig = config?.wranglerConfig || {
     logLevel: 'log',
