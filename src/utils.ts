@@ -24,6 +24,7 @@ export const makeWranglerFetch = (
   const wranglerReq: Omit<RequestInit, 'dispatcher'> = {
     headers,
     method,
+    redirect: 'manual',
   };
 
   if (!['GET', 'HEAD'].includes(method!.toUpperCase())) {
