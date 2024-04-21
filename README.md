@@ -179,7 +179,7 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 > npx wrangler pages deploy ./dist
 ```
 
-### Node Dependencies
+### Node Dependencies in Pages Functions
 _This only works for Node libraries used by Pages Functions. If you are consuming Node libraries in your front-end(which will produce the same message), you
 need to correct that by utilizing poly-fills._
 
@@ -207,3 +207,5 @@ export default defineConfig({
   ],
 });
 ```
+
+Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and update Cloudflare configuration as well.
