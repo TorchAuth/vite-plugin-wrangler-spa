@@ -179,14 +179,31 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 > npx wrangler pages deploy ./dist
 ```
 
-## Hono Type Problems
+### Node Dependencies
+_This only works for Node libraries used by Pages Functions. If you are consuming Node libraries in your front-end(which will produce the same message), you
+need to correct that by utilizing poly-fills._
 
-_If using Hono as your Functions API framework_
+Sometimes you will find that Vite will fail to build due to an error similar to `Module "<some-module>" has been externalized for browser compatibility`.
+This likely means your Pages Fuctions is using built-in Node libraries, which is perfectly acceptable. You can tell Vite to ignore these libraries by changing
+`vite.config.js` to resemble the following:
 
-Due to the way Hono declares it's own JSX types, situations can occur where they collide with the React types.
-If the 2 code bases don't touch directly, this works fine. However, utilizing something such as Hono's `hc` client
-will cause references between the two to be made, which can cause `tsc` to fail with errors when building.
+```ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import viteWranglerSpa from 'vite-wrangler-spa';
 
-To avoid this, a separate `tsconfig.json` file must be placed in the `functions` directory. See the React example for guidance.
-
-This also can cause some shared bundles to be created. This is a known issue, and if it causes problems please open an issue.
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      external: ["module-named-in-error", "...other modules"],
+    },
+  },
+  plugins: [
+    react(),
+    viteWranglerSpa({
+      functionEntrypoint: 'functions/index.tsx',
+      allowedApiPaths: ['/api/*', '/oauth/*'],
+    }),
+  ],
+});
+```
