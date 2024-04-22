@@ -179,9 +179,41 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 > npx wrangler pages deploy ./dist
 ```
 
-### Node Dependencies in Pages Functions
-_This only works for Node libraries used by Pages Functions. If you are consuming Node libraries in your front-end(which will produce the same message), you
-need to correct that by utilizing poly-fills._
+## Node Dependencies in Pages Functions
+
+_This section only applies if you are using native Node libraries in your Function. If you are consuming Node libraries in your front-end(which will produce the same message), you need to correct that by replacing those libraries with client-friendly ones, or utilizing poly-fills_
+
+### At Development Time
+
+Due to the way this plugin works with Vite, Vite attempts to transpile _everything_ for the browser, including your Functions code. This causes issues in the browser,
+because Vite will prevent browser rendering if it detects server-side libraries such as `node:buffer`. These errors will appear in the browser during development mode.
+
+You need to tell Vite to ignore these during development to avoid errors such as this. The `nodePolyfills` plugin can be used to help poly-fill these libraries during
+local development, and cure any errors.
+
+```ts
+import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import react from '@vitejs/plugin-react-swc';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import viteWranglerSpa from 'vite-wrangler-spa';
+
+export default defineConfig((env) => {
+  return {
+    plugins: [
+      tsconfigPaths(),
+      viteWranglerSpa({
+        functionEntrypoint: 'functions/index.tsx',
+        allowedApiPaths: ['/api/*', '/oauth/*'],
+      }),
+      nodePolyfills({ globals: { Buffer: env.command === 'serve' } }),
+      react(),
+    ],
+  };
+});
+```
+
+### At Build Time
 
 Sometimes you will find that Vite will fail to build due to an error similar to `Module "<some-module>" has been externalized for browser compatibility`.
 This likely means your Pages Fuctions is using built-in Node libraries, which is perfectly acceptable. You can tell Vite to ignore these libraries by changing
@@ -195,16 +227,45 @@ import viteWranglerSpa from 'vite-wrangler-spa';
 export default defineConfig({
   build: {
     rollupOptions: {
-      external: ["module-named-in-error", "...other modules"],
+      external: ['node:buffer'], //<--- ignore these libs
     },
   },
   plugins: [
-    react(),
     viteWranglerSpa({
       functionEntrypoint: 'functions/index.tsx',
       allowedApiPaths: ['/api/*', '/oauth/*'],
     }),
+    react(),
   ],
+});
+```
+
+Realistically, if you encounter either of these errors, you will most likely need both fixes. That configuration would resemble the following:
+
+```ts
+import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import react from '@vitejs/plugin-react-swc';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import viteWranglerSpa from 'vite-wrangler-spa';
+
+export default defineConfig((env) => {
+  return {
+    build: {
+      rollupOptions: {
+        external: ['node:buffer'],
+      },
+    },
+    plugins: [
+      tsconfigPaths(),
+      viteWranglerSpa({
+        functionEntrypoint: 'functions/index.tsx',
+        allowedApiPaths: ['/api/*', '/oauth/*'],
+      }),
+      nodePolyfills({ globals: { Buffer: env.command === 'serve' } }),
+      react(),
+    ],
+  };
 });
 ```
 
