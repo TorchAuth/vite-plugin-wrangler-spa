@@ -181,12 +181,11 @@ The final package will be placed into `/dist` and it can be uploaded directly to
 
 ## Node Dependencies in Pages Functions
 
-_This section only applies if you are using native Node libraries in your Function. If you are consuming Node libraries in your front-end(which will produce the same message), you need to correct that by replacing those libraries with client-friendly ones, or utilizing poly-fills_
+_This section only applies if you are using native Node libraries in your Pages Function. If you are consuming Node libraries in your front-end(which will produce the same messages), you need to correct that by replacing those libraries with client-friendly ones, or utilizing poly-fills_
 
-### At Development Time
+Due to the way this plugin works with Vite, Vite attempts to transpile _everything_ for the browser, including your Pages Function code.
 
-Due to the way this plugin works with Vite, Vite attempts to transpile _everything_ for the browser, including your Functions code. This causes issues in the browser,
-because Vite will prevent browser rendering if it detects server-side libraries such as `node:buffer`. These errors will appear in the browser during development mode.
+_These errors will appear in the browser during development mode, and the console during build-time._
 
 You need to tell Vite to ignore these during development to avoid errors such as this. The `nodePolyfills` plugin can be used to help poly-fill these libraries during
 local development, and cure any errors.
@@ -198,7 +197,7 @@ import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import viteWranglerSpa from 'vite-wrangler-spa';
 
-export default defineConfig((env) => {
+export default defineConfig(() => {
   return {
     plugins: [
       tsconfigPaths(),
@@ -206,67 +205,14 @@ export default defineConfig((env) => {
         functionEntrypoint: 'functions/index.tsx',
         allowedApiPaths: ['/api/*', '/oauth/*'],
       }),
-      nodePolyfills({ globals: { Buffer: env.command === 'serve' } }),
+      nodePolyfills({ globals: { Buffer: 'dev' } }),
       react(),
     ],
   };
 });
 ```
 
-### At Build Time
+Final distribution bundles should be inspected to make sure server-side polyfills aren't making their way into your frontend code. While they probably won't cause issues,
+they will increase bundle size.
 
-Sometimes you will find that Vite will fail to build due to an error similar to `Module "<some-module>" has been externalized for browser compatibility`.
-This likely means your Pages Fuctions is using built-in Node libraries, which is perfectly acceptable. You can tell Vite to ignore these libraries by changing
-`vite.config.js` to resemble the following:
-
-```ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import viteWranglerSpa from 'vite-wrangler-spa';
-
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      external: ['node:buffer'], //<--- ignore these libs
-    },
-  },
-  plugins: [
-    viteWranglerSpa({
-      functionEntrypoint: 'functions/index.tsx',
-      allowedApiPaths: ['/api/*', '/oauth/*'],
-    }),
-    react(),
-  ],
-});
-```
-
-Realistically, if you encounter either of these errors, you will most likely need both fixes. That configuration would resemble the following:
-
-```ts
-import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import react from '@vitejs/plugin-react-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import viteWranglerSpa from 'vite-wrangler-spa';
-
-export default defineConfig((env) => {
-  return {
-    build: {
-      rollupOptions: {
-        external: ['node:buffer'],
-      },
-    },
-    plugins: [
-      tsconfigPaths(),
-      viteWranglerSpa({
-        functionEntrypoint: 'functions/index.tsx',
-        allowedApiPaths: ['/api/*', '/oauth/*'],
-      }),
-      nodePolyfills({ globals: { Buffer: env.command === 'serve' } }),
-      react(),
-    ],
-  };
-});
-```
-
-Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and update Cloudflare configuration as well.
+Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and ensure your Cloudflare Pages configuration has been updated as well.
