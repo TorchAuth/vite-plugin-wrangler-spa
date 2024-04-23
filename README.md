@@ -19,6 +19,9 @@ Cloudflare functions to run with LiveReload locally, and at the same time.
   - KV
   - etc
 
+Much of this plugin takes inspiration from [`@hono/vite-cloudflare-pages`](https://github.com/honojs/vite-plugins/tree/main/packages/cloudflare-pages),
+so thank you to the Hono team.
+
 ## Usage
 
 _A detailed example can be found in the `examples` directory, but a brief overview of installing and configuring this plugin is as follows_

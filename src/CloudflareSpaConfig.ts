@@ -51,7 +51,8 @@ export type CloudflareSpaConfig = {
   wranglerConfigPath?: string;
 
   /**
-   * Any modules that should not be bundled with the Pages Function _worker.js
+   * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
+   * Commonly used for misbehaving modules that don't bundle well.
    */
   external?: string[];
 };
