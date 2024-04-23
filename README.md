@@ -4,9 +4,9 @@
 
 This plugin allows both the React SPA and Cloudflare functions to run with LiveReload locally, and at the same time.
 
-This solves a major pain point that currently exists, where you cannot work locally with LiveReload
-for the React project, you are forced to use `preview`. This plugin allows both the React SPA and
-Cloudflare functions to run with LiveReload locally, and at the same time.
+This solves a major pain point that currently exists, where you cannot work locally with LiveReload for the React project,
+you are forced to use `preview`. This plugin allows both the React SPA and Cloudflare functions to run with LiveReload
+locally, and at the same time.
 
 - Write React code the same as any other Vite project, with LiveReload
 - Cloudflare function code can be written within the configurable `functions` directory
@@ -19,12 +19,14 @@ Cloudflare functions to run with LiveReload locally, and at the same time.
   - KV
   - etc
 
-Much of this plugin takes inspiration from [`@hono/vite-cloudflare-pages`](https://github.com/honojs/vite-plugins/tree/main/packages/cloudflare-pages),
-so thank you to the Hono team.
+Much of this plugin takes inspiration from
+[`@hono/vite-cloudflare-pages`](https://github.com/honojs/vite-plugins/tree/main/packages/cloudflare-pages), so thank you to
+the Hono team.
 
 ## Usage
 
-_A detailed example can be found in the `examples` directory, but a brief overview of installing and configuring this plugin is as follows_
+_A detailed example can be found in the `examples` directory, but a brief overview of installing and configuring this plugin
+is as follows_
 
 This plugin is intended to be used with a standard Vite React application, though other SPA frameworks may also work.
 
@@ -55,10 +57,7 @@ const pagesPlugins = [tsconfigPaths(), react(), viteWranglerSpa()];
 const functionBuildPlugins = [tsconfigPaths(), viteWranglerSpa()];
 
 export default defineConfig(({ mode, command }) => ({
-  plugins:
-    mode === 'page-function' && command === 'build'
-      ? functionBuildPlugins
-      : pagesPlugins,
+  plugins: mode === 'page-function' && command === 'build' ? functionBuildPlugins : pagesPlugins,
 }));
 ```
 
@@ -101,7 +100,8 @@ Start development mode by running `vite`.
 
 ## API Endpoints
 
-_By default we use [Hono](https://hono.dev/top) as the router, but any other Cloudflare Functions compatible router could be used as well._
+_By default we use [Hono](https://hono.dev/top) as the router, but any other Cloudflare Functions compatible router could be
+used as well._
 
 API endpoints are ran via Pages Functions. Cloudflare services should be available on the Context object with the router.
 
@@ -130,10 +130,11 @@ const route = app.get('/page', (c) => {
 });
 ```
 
-You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA.
-See the [Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
+You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA. See the
+[Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
 
-_Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull your entire Function bundle into your frontend code_
+_Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull
+your entire Function bundle into your frontend code_
 
 ```ts
 //App.tsx
@@ -175,11 +176,16 @@ All settings are optional, with the default being used when no other value is se
 | `/some/path`   |             exact match             |
 | `/some/path/*` | match all routes with `/some/path/` |
 
-Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`) as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will not work correctly once deployed to Cloudflare. [See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
+Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`)
+as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will
+not work correctly once deployed to Cloudflare.
+
+[See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
 
 ## Build & Deploy to Cloudflare
 
-To produce a prodution bundle, **two build steps are required**. This is to ensure code separation between the static frontend and the Function backend code.
+To produce a prodution bundle, **two build steps are required**. This is to ensure code separation between the static
+frontend and the Function backend code.
 
 ```sh
 ## Build production bundle
@@ -190,14 +196,18 @@ Your React app will be packaged as normal and the `functions` code will be packa
 
 The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler, CI/CD, or the UI.
 
-Additionally, a `_routes.json` file will also be created to prevent the functions from intercepting requests that should go to the frontend.
-Route file contents are dictated by the `allowedApiPaths` and `excludedApiPaths` configuration options.
-
-Final distribution bundles should be inspected to make sure server-side polyfills aren't making their way into your frontend code, and frontend packages aren't making their way into your Function bundle. While they probably won't cause issues, they will increase bundle size.
-
-Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and ensure your Cloudflare Pages configuration has been updated as well.
-
 ```sh
 ## Upload via wrangler
 > npx wrangler pages deploy ./dist
 ```
+
+Additionally, a `_routes.json` file will also be created to prevent the functions from intercepting requests that should go
+to the frontend. Route file contents are dictated by the `allowedApiPaths` and `excludedApiPaths` configuration options.
+
+Final distribution bundles should be inspected to make sure server-side packages aren't making their way into your frontend
+code, and frontend packages aren't making their way into your Function bundle. While they probably won't cause issues, they
+will increase bundle size.
+
+Also, don't forget to update your `wrangler.toml` file to include
+[`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and
+ensure your Cloudflare Pages configuration has been updated as well.
