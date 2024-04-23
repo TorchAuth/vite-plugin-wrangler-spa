@@ -146,8 +146,9 @@ const route = app.get('/page', (c) => {
 You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA. See the
 [Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
 
-_**Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull
-your entire Function bundle into your frontend code**_
+_**Beware when importing types from backend `functions` into your frontend application. Depending on how they are exported,
+it could pull your entire Function bundle into your frontend code. Always double-check the final bundle to ensure you
+haven't accidentally imported more than you wanted.**_
 
 ```ts
 //App.tsx
