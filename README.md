@@ -102,14 +102,14 @@ Start development mode by running `vite`.
 
 All settings are optional, with the default being used when no other value is set.
 
-| Name               |                                                   Description                                                    |                    Default |
-| ------------------ | :--------------------------------------------------------------------------------------------------------------: | -------------------------: |
-| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                `["/api/*]` |
-| excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                       `[]` |
-| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |       `functions/index.ts` |
-| wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
-| wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
-| external           |                                 Any Function packages that should not be bundled                                 |                       `[]` |
+| Name               |                                                   Description                                                    |                                                                                                                                                    Default |
+| ------------------ | :--------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                                                                                                                                                `["/api/*]` |
+| excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                                                                                                                                                       `[]` |
+| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |                                                                                                                                       `functions/index.ts` |
+| wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | [see Wrangler documentation](https://github.com/cloudflare/workers-sdk/blob/c81fa65cbc4b1749ab31afb114cc3cb40e22fef9/packages/wrangler/src/api/dev.ts#L13) |
+| wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |                                                                                                                                            `wrangler.toml` |
+| external           |                                 Any Function packages that should not be bundled                                 |                                                                                                                                                       `[]` |
 
 ## API Endpoints
 
