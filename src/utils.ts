@@ -3,6 +3,12 @@ import { Readable } from 'node:stream';
 import { splitCookiesString } from 'set-cookie-parser';
 import type { UnstableDevWorker } from 'wrangler';
 
+/*
+  Credits to the SvelteKit team and Astro team. 
+  Much of this was swiped from Astro, who in turn swiped it from SvelteKit.
+	https://github.com/sveltejs/kit/blob/8d1ba04825a540324bc003e85f36559a594aadc2/packages/kit/src/exports/node/index.js
+*/
+
 // undici types are required to avoid collision between node `Response` and fetch `Response`
 import type { RequestInit, Response } from 'undici';
 

@@ -49,4 +49,9 @@ export type CloudflareSpaConfig = {
    * **default: 'wrangler.toml'**
    */
   wranglerConfigPath?: string;
+
+  /**
+   * Any modules that should not be bundled with the Pages Function _worker.js
+   */
+  external?: string[];
 };
