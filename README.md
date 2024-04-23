@@ -49,13 +49,17 @@ Alter your `vite.config.ts` file to include this plugin:
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import viteWranglerSpa from 'vite-wrangler-spa';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig({
-  build: {
-    minify: false,
-  },
-  plugins: [react(), viteWranglerSpa()],
-});
+const pagesPlugins = [tsconfigPaths(), react(), viteWranglerSpa()];
+const functionBuildPlugins = [tsconfigPaths(), viteWranglerSpa()];
+
+export default defineConfig(({ mode, command }) => ({
+  plugins:
+    mode === 'page-function' && command === 'build'
+      ? functionBuildPlugins
+      : pagesPlugins,
+}));
 ```
 
 Add an `index.ts` file to the `functions` directory:
@@ -92,6 +96,8 @@ Add a `tsconfig.json` file to the `functions` directory to fix type issues:
   }
 }
 ```
+
+Start development mode by running `vite`.
 
 ## API Endpoints
 
@@ -154,6 +160,7 @@ All settings are optional, with the default being used when no other value is se
 | functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |       `functions/index.ts` |
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
 | wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
+| external           |                                 Any Function packages that should not be bundled                                 |                       `[]` |
 
 ### Allowed/Excluded Api Paths
 
@@ -170,52 +177,25 @@ Strings should be in the format of a url fragment `/some/path`. Asterisks can be
 
 ## Build & Deploy to Cloudflare
 
-Upon building, the final artifact is ready to be deployed. Your React app will be packaged as normal and the `functions` code will be packaged into a `_worker.js` file.
+To produce a prodution bundle, **two build steps are required**. This is to ensure separate between the static frontend and the Function backend code.
+
+```sh
+## Build production bundle
+> vite build && vite build --mode page-function
+```
+
+Your React app will be packaged as normal and the `functions` code will be packaged into a `_worker.js` file.
+
+The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler, CI/CD, or the UI.
 
 Additionally, a `_routes.json` file will also be created to prevent the functions from intercepting requests that should go to the frontend.
 Route file contents are dictated by the `allowedApiPaths` and `excludedApiPaths` configuration options.
 
-The final package will be placed into `/dist` and it can be uploaded directly to Cloudflare via wrangler, CI/CD, or the UI.
+Final distribution bundles should be inspected to make sure server-side polyfills aren't making their way into your frontend code, and frontend packages aren't making their way into your Function bundle. While they probably won't cause issues, they will increase bundle size.
+
+Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and ensure your Cloudflare Pages configuration has been updated as well.
 
 ```sh
 ## Upload via wrangler
 > npx wrangler pages deploy ./dist
 ```
-
-## Node Dependencies in Pages Functions
-
-_This section only applies if you are using native Node libraries in your Pages Function. If you are consuming Node libraries in your front-end(which will produce the same messages), you need to correct that by replacing those libraries with client-friendly ones, or utilizing poly-fills_
-
-Due to the way this plugin works with Vite, Vite attempts to transpile _everything_ for the browser, including your Pages Function code.
-
-_These errors will appear in the browser during development mode, and the console during build-time._
-
-You need to tell Vite to ignore these during development to avoid errors such as this. The `nodePolyfills` plugin can be used to help poly-fill these libraries during
-local development, and cure any errors.
-
-```ts
-import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-import react from '@vitejs/plugin-react-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
-import viteWranglerSpa from 'vite-wrangler-spa';
-
-export default defineConfig(() => {
-  return {
-    plugins: [
-      tsconfigPaths(),
-      viteWranglerSpa({
-        functionEntrypoint: 'functions/index.tsx',
-        allowedApiPaths: ['/api/*', '/oauth/*'],
-      }),
-      nodePolyfills({ globals: { Buffer: 'dev' } }),
-      react(),
-    ],
-  };
-});
-```
-
-Final distribution bundles should be inspected to make sure server-side polyfills aren't making their way into your frontend code. While they probably won't cause issues,
-they will increase bundle size.
-
-Also, don't forget to update your `wrangler.toml` file to include [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and ensure your Cloudflare Pages configuration has been updated as well.
