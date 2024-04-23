@@ -98,10 +98,23 @@ Add a `tsconfig.json` file to the `functions` directory to fix type issues:
 
 Start development mode by running `vite`.
 
+## Vite Plugin Configuration
+
+All settings are optional, with the default being used when no other value is set.
+
+| Name               |                                                   Description                                                    |                    Default |
+| ------------------ | :--------------------------------------------------------------------------------------------------------------: | -------------------------: |
+| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                `["/api/*]` |
+| excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                       `[]` |
+| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |       `functions/index.ts` |
+| wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
+| wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
+| external           |                                 Any Function packages that should not be bundled                                 |                       `[]` |
+
 ## API Endpoints
 
-_By default we use [Hono](https://hono.dev/top) as the router, but any other Cloudflare Functions compatible router could be
-used as well._
+_By default we presume [Hono](https://hono.dev/top) as the router, but any other Cloudflare Functions compatible router
+could be used as well._
 
 API endpoints are ran via Pages Functions. Cloudflare services should be available on the Context object with the router.
 
@@ -133,8 +146,8 @@ const route = app.get('/page', (c) => {
 You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA. See the
 [Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
 
-_Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull
-your entire Function bundle into your frontend code_
+_**Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull
+your entire Function bundle into your frontend code**_
 
 ```ts
 //App.tsx
@@ -151,19 +164,6 @@ useEffect(() => {
   fetchStuff();
 }, []);
 ```
-
-## Vite Plugin Configuration
-
-All settings are optional, with the default being used when no other value is set.
-
-| Name               |                                                   Description                                                    |                    Default |
-| ------------------ | :--------------------------------------------------------------------------------------------------------------: | -------------------------: |
-| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                `["/api/*]` |
-| excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                       `[]` |
-| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |       `functions/index.ts` |
-| wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | see Wrangler documentation |
-| wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |            `wrangler.toml` |
-| external           |                                 Any Function packages that should not be bundled                                 |                       `[]` |
 
 ### Allowed/Excluded Api Paths
 
