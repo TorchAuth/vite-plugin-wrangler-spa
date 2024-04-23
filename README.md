@@ -133,6 +133,8 @@ const route = app.get('/page', (c) => {
 You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA.
 See the [Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
 
+_Beware importing files from `functions` into your frontend application. Depending on how they are exported, it could pull your entire Function bundle into your frontend code_
+
 ```ts
 //App.tsx
 const [remote, setRemote] = useState<string | undefined>(undefined);
@@ -177,7 +179,7 @@ Strings should be in the format of a url fragment `/some/path`. Asterisks can be
 
 ## Build & Deploy to Cloudflare
 
-To produce a prodution bundle, **two build steps are required**. This is to ensure separate between the static frontend and the Function backend code.
+To produce a prodution bundle, **two build steps are required**. This is to ensure code separation between the static frontend and the Function backend code.
 
 ```sh
 ## Build production bundle
