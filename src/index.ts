@@ -2,14 +2,29 @@ import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { builtinModules } from 'node:module';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
+import { transform } from '@swc/core';
 import { writeFileSync } from 'node:fs';
 import type { Plugin, PluginOption } from 'vite';
+import type { Options as SWCOptions } from '@swc/core';
 
 let wranglerDevServer: UnstableDevWorker;
 
-export default function viteWranglerSpa(
-  config?: CloudflareSpaConfig
-): PluginOption {
+const defaults: SWCOptions = {
+  jsc: {
+    target: 'esnext',
+    parser: {
+      syntax: 'typescript',
+      decorators: true,
+    },
+    transform: {
+      decoratorMetadata: true,
+      legacyDecorator: true,
+    },
+    loose: true,
+  },
+};
+
+export default function viteWranglerSpa(config?: CloudflareSpaConfig): PluginOption {
   const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
   const wranglerConfig = config?.wranglerConfig || {
     logLevel: 'log',
@@ -49,13 +64,17 @@ export default function viteWranglerSpa(
       };
     },
 
+    transform(code) {
+      return transform(code, {
+        ...defaults,
+        sourceMaps: true,
+      });
+    },
+
     /** Start the wrangler miniflare server */
     configureServer: async (devServer) => {
       if (!wranglerDevServer) {
-        wranglerDevServer = await unstable_dev(
-          functionEntrypoint,
-          wranglerConfig
-        );
+        wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
       }
 
       //setup middleware to redirect requests to miniflare
@@ -63,8 +82,7 @@ export default function viteWranglerSpa(
         const { url } = req;
         if (url === undefined) throw new Error('url is undefined!');
 
-        if (excludedApiPaths.find((x) => new RegExp(x).test(url)))
-          return next();
+        if (excludedApiPaths.find((x) => new RegExp(x).test(url))) return next();
 
         /** only direct specific requests to the miniflare server so the SPA still renders correctly */
         if (allowedApiPaths.find((x) => new RegExp(x).test(url))) {
