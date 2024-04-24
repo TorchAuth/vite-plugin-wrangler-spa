@@ -1,5 +1,5 @@
 {
-  "name": "vite-wrangler-spa",
+  "name": "@torchauth/vite-plugin-wrangler-spa",
   "version": "0.0.16",
   "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
   "author": "Bruce Harrison",
@@ -18,9 +18,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bruceharrison1984/vite-wrangler-spa"
+    "url": "https://github.com/TorchAuth/vite-plugin-wrangler-spa.git"
   },
-  "homepage": "https://github.com/bruceharrison1984/vite-wrangler-spa",
+  "homepage": "https://github.com/TorchAuth/vite-plugin-wrangler-spa.git",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
     "access": "public"

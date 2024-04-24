@@ -1,4 +1,4 @@
-# vite-wrangler-spa
+# @torchauth/vite-plugin-wrangler-spa
 
 [![NPM Version](https://img.shields.io/npm/v/vite-wrangler-spa)](https://www.npmjs.com/package/vite-wrangler-spa)
 
@@ -38,8 +38,8 @@ This plugin is intended to be used with a standard Vite React application, thoug
 ## Create folder to hold Cloudflare Pages Functions code
 > mkdir functions
 
-## Install vite-wrangler-spa
-> npm i -D vite-wrangler-spa
+## Install @torchauth/vite-plugin-wrangler-spa
+> npm i -D @torchauth/vite-plugin-wrangler-spa
 
 ## Install Hono
 > npm i hono
@@ -49,7 +49,7 @@ Alter your `vite.config.ts` file to include this plugin:
 
 ```ts
 import { defineConfig } from 'vite';
-import { viteWranglerSpa } from 'vite-wrangler-spa';
+import { viteWranglerSpa } from '@torchauth/vite-plugin-wrangler-spa';
 import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
