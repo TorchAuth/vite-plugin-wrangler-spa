@@ -5,8 +5,6 @@ import { getViteConfig } from './util';
 import type { Plugin, PluginOption } from 'vite';
 
 export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
-  if (!config?.miniflareEnabled) return false;
-
   let wranglerDevServer: UnstableDevWorker;
 
   const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
@@ -26,7 +24,9 @@ export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (
 
   const plugin = {
     name: 'vite-wrangler-spa:miniflare',
-    config: () => getViteConfig(config),
+    config: (_, { command }) => {
+      if (command === 'serve') return getViteConfig(config);
+    },
     configureServer: async (devServer) => {
       if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
 

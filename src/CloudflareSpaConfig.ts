@@ -15,15 +15,6 @@ export type CloudflareSpaConfig = {
   allowedApiPaths?: string[];
 
   /**
-   * Should Miniflare be enabled
-   *
-   * This should only be enabled during vite `serve` command
-   *
-   * ex: `miniflareEnabled: command === 'serve'`
-   */
-  miniflareEnabled?: boolean;
-
-  /**
    * These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA.
    *
    * This should only be defined if you have issues with functions running when they shouldn't be, rely on `allowedApiPaths` first.
