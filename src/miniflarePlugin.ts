@@ -1,7 +1,7 @@
 import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
-import { getViteConfig } from './util';
+import { getViteConfig } from './utils';
 import type { Plugin, PluginOption } from 'vite';
 
 export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {

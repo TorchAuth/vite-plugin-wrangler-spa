@@ -1,5 +1,5 @@
 import { CloudflareSpaConfig } from './CloudflareSpaConfig';
-import { getViteConfig } from './util';
+import { getViteConfig } from './utils';
 import { transform as swcTransform } from '@swc/core';
 import { writeFileSync } from 'node:fs';
 import type { Plugin, PluginOption } from 'vite';

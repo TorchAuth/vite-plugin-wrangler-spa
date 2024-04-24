@@ -1,5 +1,7 @@
+import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
+import { builtinModules } from 'node:module';
 import { splitCookiesString } from 'set-cookie-parser';
 import type { UnstableDevWorker } from 'wrangler';
 
@@ -13,10 +15,7 @@ import type { UnstableDevWorker } from 'wrangler';
 import type { RequestInit, Response } from 'undici';
 
 /** Convert the NodeJS request into a webworker fetch request */
-export const makeWranglerFetch = (
-  req: IncomingMessage,
-  wranglerDevServer: UnstableDevWorker
-): Promise<Response> => {
+export const makeWranglerFetch = (req: IncomingMessage, wranglerDevServer: UnstableDevWorker): Promise<Response> => {
   const { rawHeaders, method, url } = req;
 
   const headers: Record<string, string> = {};
@@ -42,10 +41,7 @@ export const makeWranglerFetch = (
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
-export const convertWranglerResponse = (
-  wranglerResponse: Response,
-  res: ServerResponse<IncomingMessage>
-) => {
+export const convertWranglerResponse = (wranglerResponse: Response, res: ServerResponse<IncomingMessage>) => {
   const headers = Object.fromEntries(wranglerResponse.headers);
   let cookies: string[] = [];
 
@@ -109,4 +105,27 @@ export const convertWranglerResponse = (
       cancel(error instanceof Error ? error : new Error(String(error)));
     }
   }
+};
+
+export const getViteConfig = (config?: CloudflareSpaConfig) => {
+  const input = config?.functionEntrypoint || 'functions/index.ts';
+  const external = config?.external || [];
+
+  return {
+    ssr: {
+      external,
+      noExternal: true,
+    },
+    esbuild: false, // we use SWC to build
+    build: {
+      rollupOptions: {
+        external: [...builtinModules, /^node:/],
+        input,
+        preserveEntrySignatures: 'allow-extension',
+        output: { entryFileNames: '_worker.js' },
+      },
+      emptyOutDir: false,
+      ssr: true,
+    },
+  };
 };

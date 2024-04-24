@@ -48,10 +48,10 @@
     "typescript": "^5.4.5",
     "undici": "^6.14.0"
   },
-  "peerDependencies": {
+  "dependencies": {
+    "@swc/core": "^1.4.17",
     "set-cookie-parser": "^2.6.0",
     "vite": "^5.2.10",
-    "wrangler": "3.49.0",
-    "@swc/core": "^1.4.17"
+    "wrangler": "3.49.0"
   }
 }
