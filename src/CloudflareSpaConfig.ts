@@ -15,6 +15,24 @@ export type CloudflareSpaConfig = {
   allowedApiPaths?: string[];
 
   /**
+   * Should SWC transpilation be enabled?
+   *
+   * It should generally only be enabled during a page-function build
+   *
+   * ex: `swcEnabled: mode === 'page-function' && command === 'build'`
+   */
+  swcEnabled?: boolean;
+
+  /**
+   * Should Miniflare be enabled
+   *
+   * This should only be enabled during vite `serve` command
+   *
+   * ex: `miniflareEnabled: command === 'serve'`
+   */
+  miniflareEnabled?: boolean;
+
+  /**
    * These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA.
    *
    * This should only be defined if you have issues with functions running when they shouldn't be, rely on `allowedApiPaths` first.
@@ -24,6 +42,12 @@ export type CloudflareSpaConfig = {
    * **default: []**
    */
   excludedApiPaths?: string[];
+
+  /**
+   * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
+   * Commonly used for misbehaving modules that don't bundle well.
+   */
+  external?: string[];
 
   /**
    * The file that will be used as the entry point for the Cloudflare Pages functions
@@ -49,10 +73,4 @@ export type CloudflareSpaConfig = {
    * **default: 'wrangler.toml'**
    */
   wranglerConfigPath?: string;
-
-  /**
-   * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
-   * Commonly used for misbehaving modules that don't bundle well.
-   */
-  external?: string[];
 };
