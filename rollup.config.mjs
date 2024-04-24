@@ -7,7 +7,7 @@ const options = defineConfig({
     dir: 'dist',
     format: 'esm',
   },
-  external: ['wrangler', 'vite', 'node:fs', 'node:stream', 'set-cookie-parser'],
+  external: ['wrangler', 'vite', /node:/, 'set-cookie-parser', '@swc/core', 'module'],
   plugins: [ts()],
 });
 

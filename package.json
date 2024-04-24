@@ -36,7 +36,6 @@
     "lint": "eslint src --ext .ts"
   },
   "devDependencies": {
-    "@swc/core": "^1.4.17",
     "@types/node": "^20.12.7",
     "@types/set-cookie-parser": "^2.4.7",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
@@ -52,6 +51,7 @@
   "peerDependencies": {
     "set-cookie-parser": "^2.6.0",
     "vite": "^5.2.10",
-    "wrangler": "3.49.0"
+    "wrangler": "3.49.0",
+    "@swc/core": "^1.4.17"
   }
 }
