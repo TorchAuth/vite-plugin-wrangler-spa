@@ -50,15 +50,17 @@ Alter your `vite.config.ts` file to include this plugin:
 ```ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-import viteWranglerSpa from 'vite-wrangler-spa';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { viteWranglerSpa } from 'vite-wrangler-spa';
 
-const pagesPlugins = [tsconfigPaths(), react(), viteWranglerSpa()];
-const functionBuildPlugins = [tsconfigPaths(), viteWranglerSpa()];
-
-export default defineConfig(({ mode, command }) => ({
-  plugins: mode === 'page-function' && command === 'build' ? functionBuildPlugins : pagesPlugins,
-}));
+export default defineConfig(() => {
+  return {
+    build: {
+      minify: true,
+    },
+    plugins: [tsconfigPaths(), react(), viteWranglerSpa()],
+  };
+});
 ```
 
 Add an `index.ts` file to the `functions` directory:
@@ -106,7 +108,7 @@ All settings are optional, with the default being used when no other value is se
 | ------------------ | :--------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                                                                                                                                                `["/api/*]` |
 | excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                                                                                                                                                       `[]` |
-| functionEntrypoint |                 The file that will be used as the entry point for the Cloudflare Pages functions                 |                                                                                                                                       `functions/index.ts` |
+| functionEntrypoint |            The file (/tsx?/) that will be used as the entry point for the Cloudflare Pages functions.            |                                                                                                                                       `functions/index.ts` |
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | [see Wrangler documentation](https://github.com/cloudflare/workers-sdk/blob/c81fa65cbc4b1749ab31afb114cc3cb40e22fef9/packages/wrangler/src/api/dev.ts#L13) |
 | wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |                                                                                                                                            `wrangler.toml` |
 | external           |                                 Any Function packages that should not be bundled                                 |                                                                                                                                                       `[]` |
@@ -131,7 +133,7 @@ const route = app.get('/hello', (c) => {
 });
 ```
 
-Any updates to the API will trigger a full refresh in the browser window, as well as print a console message.
+Any updates to the API will trigger a full refresh in the browser window, as well as print a console message in the browser.
 
 You can also return HTML directly to facilitate HTMX applications:
 
@@ -143,28 +145,9 @@ const route = app.get('/page', (c) => {
 });
 ```
 
-You can also utilize Hono's built in RPC functions to automatically map your Function API into your React SPA. See the
-[Hono documentation](https://hono.dev/guides/rpc) for more information about this feature.
-
-_**Beware when importing types from backend `functions` into your frontend application. Depending on how they are exported,
+_**Beware when importing types from backend `/functions` into your frontend application. Depending on how they are exported,
 it could pull your entire Function bundle into your frontend code. Always double-check the final bundle to ensure you
 haven't accidentally imported more than you wanted.**_
-
-```ts
-//App.tsx
-const [remote, setRemote] = useState<string | undefined>(undefined);
-
-useEffect(() => {
-  async function fetchStuff() {
-    const resp = await hc<AppType>('').api.hello.$get({
-      query: { name: 'test' },
-    });
-    setRemote(await resp.text());
-  }
-
-  fetchStuff();
-}, []);
-```
 
 ### Allowed/Excluded Api Paths
 
