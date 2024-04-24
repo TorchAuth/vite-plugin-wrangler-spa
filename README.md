@@ -49,16 +49,20 @@ Alter your `vite.config.ts` file to include this plugin:
 
 ```ts
 import { defineConfig } from 'vite';
+import { viteWranglerSpa } from 'vite-wrangler-spa';
 import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { viteWranglerSpa } from 'vite-wrangler-spa';
 
 export default defineConfig(() => {
   return {
-    build: {
-      minify: true,
-    },
-    plugins: [tsconfigPaths(), react(), viteWranglerSpa()],
+    plugins: [
+      tsconfigPaths(), // if using paths
+      react(),
+      viteWranglerSpa({
+        functionEntrypoint: 'functions/index.tsx',
+        allowedApiPaths: ['/api/*', '/oauth/*'],
+      }),
+    ],
   };
 });
 ```
