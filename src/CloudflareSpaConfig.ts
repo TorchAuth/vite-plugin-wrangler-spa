@@ -15,15 +15,6 @@ export type CloudflareSpaConfig = {
   allowedApiPaths?: string[];
 
   /**
-   * Should SWC transpilation be enabled?
-   *
-   * It should generally only be enabled during a page-function build
-   *
-   * ex: `swcEnabled: mode === 'page-function' && command === 'build'`
-   */
-  swcEnabled?: boolean;
-
-  /**
    * Should Miniflare be enabled
    *
    * This should only be enabled during vite `serve` command

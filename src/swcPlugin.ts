@@ -1,41 +1,48 @@
 import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { getViteConfig } from './util';
-import { transform } from '@swc/core';
+import { transform as swcTransform } from '@swc/core';
 import { writeFileSync } from 'node:fs';
 import type { Plugin, PluginOption } from 'vite';
 import type { Options as SWCOptions } from '@swc/core';
 
 export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
-  if (!config?.swcEnabled) return false;
+  let runCommand: 'build' | 'serve';
+  let runMode: string;
+  const isPagesBuild = () => runCommand === 'build' && runMode === 'page-function';
 
-  return {
+  const plugin = {
     name: 'vite-plugin-wrangler-spa:swc',
+    config: (_, { command, mode }) => {
+      runCommand = command;
+      runMode = mode;
 
-    config: () => getViteConfig(config),
-
-    transform(code) {
-      return transform(code, {
-        ...swcDefaults,
-        sourceMaps: true,
-      });
+      if (isPagesBuild()) return getViteConfig(config);
     },
-
-    /** Create a _routes file to avoid functions from firing on all routes and intercepting SPA traffic */
-    writeBundle() {
-      writeFileSync(
-        'dist/_routes.json',
-        JSON.stringify(
-          {
-            version: 1,
-            include: config?.allowedApiPaths || ['/api/*'],
-            exclude: config?.excludedApiPaths || [],
-          },
-          null,
-          2
-        )
-      );
+    transform: (code) => {
+      if (isPagesBuild())
+        return swcTransform(code, {
+          ...swcDefaults,
+          sourceMaps: true,
+        });
+    },
+    writeBundle: () => {
+      if (isPagesBuild())
+        writeFileSync(
+          'dist/_routes.json',
+          JSON.stringify(
+            {
+              version: 1,
+              include: config?.allowedApiPaths || ['/api/*'],
+              exclude: config?.excludedApiPaths || [],
+            },
+            null,
+            2
+          )
+        );
     },
   } as Plugin;
+
+  return plugin;
 };
 
 const swcDefaults: SWCOptions = {
