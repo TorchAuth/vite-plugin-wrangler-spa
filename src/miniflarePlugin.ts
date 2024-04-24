@@ -23,7 +23,7 @@ export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (
   const excludedApiPaths = config?.excludedApiPaths || [];
 
   const plugin = {
-    name: 'vite-wrangler-spa:miniflare',
+    name: 'vite-plugin-wrangler-spa:miniflare',
     config: (_, { command }) => {
       if (command === 'serve') return getViteConfig(config);
     },
