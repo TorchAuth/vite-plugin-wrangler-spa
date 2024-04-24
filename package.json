@@ -28,8 +28,11 @@
   "keywords": [
     "cloudflare",
     "spa",
+    "hono",
+    "react",
     "functions",
-    "vite"
+    "vite",
+    "vite-plugin"
   ],
   "scripts": {
     "build": "rollup -c",
