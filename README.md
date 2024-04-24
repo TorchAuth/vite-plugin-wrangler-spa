@@ -81,23 +81,6 @@ export type AppType = typeof route;
 export default app;
 ```
 
-Add a `tsconfig.json` file to the `functions` directory to fix type issues:
-
-```json
-{
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "lib": ["ESNext"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "types": ["hono"]
-  }
-}
-```
-
 Start development mode by running `vite`.
 
 ## Vite Plugin Configuration
@@ -135,6 +118,28 @@ const route = app.get('/hello', (c) => {
 
 Any updates to the API will trigger a full refresh in the browser window, as well as print a console message in the browser.
 
+### Allowed/Excluded Api Paths
+
+**Excluded api paths take precedence over allowed api paths**
+
+The `allowedApiPaths` and `excludedApiPaths` plugin settings will determine which routes get routed to the frontend or
+backend.
+
+| Path           |               Result                |
+| -------------- | :---------------------------------: |
+| `/some`        |             exact match             |
+| `/some/*`      |   match all routes with `/some/`    |
+| `/some/path`   |             exact match             |
+| `/some/path/*` | match all routes with `/some/path/` |
+
+Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`)
+as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will
+not work correctly once deployed to Cloudflare.
+
+[See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
+
+### Hono HTML Endpoints
+
 You can also return HTML directly to facilitate HTMX applications:
 
 ```ts
@@ -149,22 +154,26 @@ _**Beware when importing types from backend `/functions` into your frontend appl
 it could pull your entire Function bundle into your frontend code. Always double-check the final bundle to ensure you
 haven't accidentally imported more than you wanted.**_
 
-### Allowed/Excluded Api Paths
+#### Optional: Add Hono/jsx types to functions directory
 
-**Excluded api paths take precedence over allowed api paths**
+Using Hono JSX can cause typing errors due to collisions with standard JSX types. Add a `tsconfig.json` file to the
+`functions` directory to fix type issues that may occur. These settings may need to be altered to fit your specific
+environment.
 
-| Path           |               Result                |
-| -------------- | :---------------------------------: |
-| `/some`        |             exact match             |
-| `/some/*`      |   match all routes with `/some/`    |
-| `/some/path`   |             exact match             |
-| `/some/path/*` | match all routes with `/some/path/` |
-
-Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`)
-as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will
-not work correctly once deployed to Cloudflare.
-
-[See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "lib": ["ESNext"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "types": ["hono"]
+  }
+}
+```
 
 ## Build & Deploy to Cloudflare
 
