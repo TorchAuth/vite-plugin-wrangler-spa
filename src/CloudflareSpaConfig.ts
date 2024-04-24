@@ -26,6 +26,12 @@ export type CloudflareSpaConfig = {
   excludedApiPaths?: string[];
 
   /**
+   * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
+   * Commonly used for misbehaving modules that don't bundle well.
+   */
+  external?: string[];
+
+  /**
    * The file that will be used as the entry point for the Cloudflare Pages functions
    *
    * If returning HTML from the root, you probably want *functions/index.tsx*
@@ -49,10 +55,4 @@ export type CloudflareSpaConfig = {
    * **default: 'wrangler.toml'**
    */
   wranglerConfigPath?: string;
-
-  /**
-   * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
-   * Commonly used for misbehaving modules that don't bundle well.
-   */
-  external?: string[];
 };

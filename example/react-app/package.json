@@ -7,7 +7,7 @@
     "dev": "vite",
     "tsc": "tsc",
     "build": "npm run build-pages && npm run build-function",
-    "build-pages": "vite build && vite build --mode page-function",
+    "build-pages": "vite build",
     "build-function": "vite build --mode page-function",
     "deploy": "wrangler pages deploy ./dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -31,7 +31,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "typescript": "^5.2.2",
-    "vite": "^5.2.8",
+    "vite": "^5.2.10",
     "wrangler": "^3.49.0"
   }
 }
