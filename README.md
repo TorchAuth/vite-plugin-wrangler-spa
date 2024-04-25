@@ -28,7 +28,8 @@ the Hono team.
 _A detailed example can be found in the `examples` directory, but a brief overview of installing and configuring this plugin
 is as follows_
 
-This plugin is intended to be used with a standard Vite React application, though other SPA frameworks may also work.
+This plugin is intended to be used with a standard Vite React application, though other SPA frameworks may also work. This
+plugin presumes Typescript files as the input, and makes no guarantees about plain JS files.
 
 ```sh
 ## Create a new Vite React application
