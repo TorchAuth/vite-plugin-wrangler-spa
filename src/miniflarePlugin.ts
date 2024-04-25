@@ -1,32 +1,22 @@
-import { CloudflareSpaConfig } from './CloudflareSpaConfig';
+import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { getViteConfig } from './utils';
-import type { Plugin, PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
-export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
-  let wranglerDevServer: UnstableDevWorker;
+let wranglerDevServer: UnstableDevWorker;
 
-  const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
-  const wranglerConfig = config?.wranglerConfig || {
-    logLevel: 'log',
-  };
+export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
+  const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
-  // force these Wrangler settings so HMR works for pages functions
-  wranglerConfig.experimental = {
-    liveReload: true,
-    testMode: false,
-    disableExperimentalWarning: true, //disable because it's annoying
-  };
-
-  const allowedApiPaths = config?.allowedApiPaths || ['/api/*'];
-  const excludedApiPaths = config?.excludedApiPaths || [];
+  // force wrangler settings that are required for function HMR to work
+  if (!config.wranglerConfig.experimental) config.wranglerConfig.experimental = {};
+  config.wranglerConfig.experimental.liveReload = true;
+  config.wranglerConfig.experimental.testMode = true;
 
   const plugin = {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    config: (_, { command }) => {
-      if (command === 'serve') return getViteConfig(config);
-    },
+    config: (_, { command }) => (command === 'serve' ? getViteConfig(config) : null),
     configureServer: async (devServer) => {
       if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
 
@@ -62,7 +52,7 @@ export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (
         },
       ],
     },
-  } as Plugin;
+  } as PluginOption;
 
   return plugin;
 };

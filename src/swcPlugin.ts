@@ -1,11 +1,13 @@
-import { CloudflareSpaConfig } from './CloudflareSpaConfig';
+import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { getViteConfig } from './utils';
 import { transform as swcTransform } from '@swc/core';
-import { writeFileSync } from 'node:fs';
-import type { Plugin, PluginOption } from 'vite';
+import { writeFile } from 'node:fs';
+import type { PluginOption } from 'vite';
 import type { Options as SWCOptions } from '@swc/core';
 
-export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
+export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
+  const { allowedApiPaths, excludedApiPaths } = config;
+
   let runCommand: 'build' | 'serve';
   let runMode: string;
   const isPagesBuild = () => runCommand === 'build' && runMode === 'page-function';
@@ -18,35 +20,32 @@ export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config
 
       if (isPagesBuild()) return getViteConfig(config);
     },
-    transform: (code) => {
+    transform: (code) => (isPagesBuild() ? swcTransform(code, swcDefaults) : null),
+    writeBundle: async () => {
       if (isPagesBuild())
-        return swcTransform(code, {
-          ...swcDefaults,
-          sourceMaps: true,
-        });
-    },
-    writeBundle: () => {
-      if (isPagesBuild())
-        writeFileSync(
+        await writeFile(
           'dist/_routes.json',
           JSON.stringify(
             {
               version: 1,
-              include: config?.allowedApiPaths || ['/api/*'],
-              exclude: config?.excludedApiPaths || [],
+              include: allowedApiPaths,
+              exclude: excludedApiPaths,
             },
             null,
             2
-          )
+          ),
+          (err) => (err ? console.error(err.message) : null)
         );
     },
-  } as Plugin;
+  } as PluginOption;
 
   return plugin;
 };
 
 const swcDefaults: SWCOptions = {
   minify: true,
+  sourceMaps: true,
+  inlineSourcesContent: true,
   jsc: {
     target: 'esnext',
     parser: {
