@@ -1,6 +1,5 @@
 compatibility_date = "2024-04-05"
 name = "my-app"
-upload_source_maps = true
 
 # [vars]
 # MY_VAR = "my-variable"

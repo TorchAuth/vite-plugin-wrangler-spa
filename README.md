@@ -211,5 +211,4 @@ require them.
 
 ### Function Source Maps
 
-`sourceMaps` are automatically created for your compiled functions. If you'd like to use these, set
-`upload_source_maps = true` in your `wrangler.toml` file
+`sourceMaps` are automatically created for your compiled functions and placed into `./dist`.
