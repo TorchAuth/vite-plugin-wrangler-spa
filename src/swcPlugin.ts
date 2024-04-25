@@ -1,11 +1,11 @@
-import { CloudflareSpaConfig } from './CloudflareSpaConfig';
+import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { getViteConfig } from './utils';
 import { transform as swcTransform } from '@swc/core';
 import { writeFileSync } from 'node:fs';
-import type { Plugin, PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 import type { Options as SWCOptions } from '@swc/core';
 
-export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
+export const swcPlugin = (config?: ResolvedCloudflareSpaConfig) => {
   let runCommand: 'build' | 'serve';
   let runMode: string;
   const isPagesBuild = () => runCommand === 'build' && runMode === 'page-function';
@@ -16,15 +16,11 @@ export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config
       runCommand = command;
       runMode = mode;
 
+      console.log('swc');
+
       if (isPagesBuild()) return getViteConfig(config);
     },
-    transform: (code) => {
-      if (isPagesBuild())
-        return swcTransform(code, {
-          ...swcDefaults,
-          sourceMaps: true,
-        });
-    },
+    transform: (code) => (isPagesBuild() ? swcTransform(code, swcDefaults) : null),
     writeBundle: () => {
       if (isPagesBuild())
         writeFileSync(
@@ -40,13 +36,14 @@ export const swcPlugin: (config?: CloudflareSpaConfig) => PluginOption = (config
           )
         );
     },
-  } as Plugin;
+  } as PluginOption;
 
   return plugin;
 };
 
 const swcDefaults: SWCOptions = {
   minify: true,
+  sourceMaps: true,
   jsc: {
     target: 'esnext',
     parser: {

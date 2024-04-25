@@ -1,33 +1,23 @@
-import { CloudflareSpaConfig } from './CloudflareSpaConfig';
+import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
 import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { getViteConfig } from './utils';
-import type { Plugin, PluginOption } from 'vite';
+import type { PluginOption } from 'vite';
 
-export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (config?: CloudflareSpaConfig) => {
-  let wranglerDevServer: UnstableDevWorker;
+let wranglerDevServer: UnstableDevWorker;
 
-  const functionEntrypoint = config?.functionEntrypoint || 'functions/index.ts';
-  const wranglerConfig = config?.wranglerConfig || {
-    logLevel: 'log',
-  };
-
-  // force these Wrangler settings so HMR works for pages functions
-  wranglerConfig.experimental = {
-    liveReload: true,
-    testMode: false,
-    disableExperimentalWarning: true, //disable because it's annoying
-  };
-
-  const allowedApiPaths = config?.allowedApiPaths || ['/api/*'];
-  const excludedApiPaths = config?.excludedApiPaths || [];
+export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
+  const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
   const plugin = {
     name: 'vite-plugin-wrangler-spa:miniflare',
     config: (_, { command }) => {
+      console.log('config');
+
       if (command === 'serve') return getViteConfig(config);
     },
     configureServer: async (devServer) => {
+      console.log('server');
       if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
 
       devServer.middlewares.use(async (req, res, next) => {
@@ -62,7 +52,7 @@ export const miniflarePlugin: (config?: CloudflareSpaConfig) => PluginOption = (
         },
       ],
     },
-  } as Plugin;
+  } as PluginOption;
 
   return plugin;
 };

@@ -1,6 +1,8 @@
 import { UnstableDevOptions } from 'wrangler';
 
-export type CloudflareSpaConfig = {
+export type CloudflareSpaConfig = Partial<ResolvedCloudflareSpaConfig>;
+
+export type ResolvedCloudflareSpaConfig = {
   /**
    * These are url paths that should be directed to the Cloudflare function, and not the SPA.
    *
@@ -12,7 +14,7 @@ export type CloudflareSpaConfig = {
    *
    * **default: ["/api/*"]**
    */
-  allowedApiPaths?: string[];
+  allowedApiPaths: string[];
 
   /**
    * These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA.
@@ -23,13 +25,13 @@ export type CloudflareSpaConfig = {
    *
    * **default: []**
    */
-  excludedApiPaths?: string[];
+  excludedApiPaths: string[];
 
   /**
    * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
    * Commonly used for misbehaving modules that don't bundle well.
    */
-  external?: string[];
+  external: string[];
 
   /**
    * The file that will be used as the entry point for the Cloudflare Pages functions
@@ -38,7 +40,7 @@ export type CloudflareSpaConfig = {
    *
    * **default: 'functions/index.ts'**
    */
-  functionEntrypoint?: string;
+  functionEntrypoint: string;
 
   /**
    * Pass through for Wrangler configuration objects
@@ -47,12 +49,12 @@ export type CloudflareSpaConfig = {
    *
    * See wrangler documentation for more information
    */
-  wranglerConfig?: UnstableDevOptions;
+  wranglerConfig: UnstableDevOptions;
 
   /**
    * Location of your `wrangler.toml` file for usage in setting up Wrangler local services
    *
    * **default: 'wrangler.toml'**
    */
-  wranglerConfigPath?: string;
+  wranglerConfigPath: string;
 };

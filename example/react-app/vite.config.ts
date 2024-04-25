@@ -4,9 +4,6 @@ import { viteWranglerSpa } from '../../src';
 
 export default defineConfig(() => {
   return {
-    build: {
-      minify: true,
-    },
     plugins: [
       react(),
       viteWranglerSpa({
