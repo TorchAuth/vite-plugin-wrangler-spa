@@ -22,16 +22,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.4
 
       - name: Get Release Version
         id: getReleaseVersion
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/v}
 
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 20.x
           registry-url: https://registry.npmjs.org/
 
       - name: Update NPM
@@ -56,10 +56,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 20.x
           registry-url: https://registry.npmjs.org/
       - uses: actions/checkout@v3
         with:
