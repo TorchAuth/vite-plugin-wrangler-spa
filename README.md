@@ -1,7 +1,5 @@
 # @torchauth/vite-plugin-wrangler-spa
 
-
-
 [![NPM Version](https://img.shields.io/npm/v/@torchauth/vite-plugin-wrangler-spa)](https://www.npmjs.com/package/@torchauth/vite-plugin-wrangler-spa)
 
 This plugin allows both the React SPA and Cloudflare functions to run with LiveReload locally, and at the same time.
@@ -207,6 +205,11 @@ Final distribution bundles should be inspected to make sure server-side packages
 code, and frontend packages aren't making their way into your Function bundle. While they probably won't cause issues, they
 will increase bundle size.
 
-Also, don't forget to update your `wrangler.toml` file to include
-[`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), and
-ensure your Cloudflare Pages configuration has been updated as well.
+Also, don't forget to update your `wrangler.toml` file to include any
+[`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), if you
+require them.
+
+### Function Source Maps
+
+`sourceMaps` are automatically created for your compiled functions. If you'd like to use these, set
+`upload_source_maps = true` in your `wrangler.toml` file
