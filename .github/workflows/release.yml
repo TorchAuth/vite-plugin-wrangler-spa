@@ -23,45 +23,37 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.1.4
-
       - name: Get Release Version
         id: getReleaseVersion
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/v}
-
       - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: 20.x
           registry-url: https://registry.npmjs.org/
-
       - name: Update NPM
         run: npm install -g npm
-
       - name: NPM Install
         run: npm ci
-
       - name: Lint
         run: npm run lint
-
       - name: Build
         run: npm run build
-
       - name: Upload vite-wrangler-spa package artifact
         uses: actions/upload-artifact@v4
         with:
           name: vite-wrangler-spa
           path: ./dist
-
   publish-package:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.0.2
         with:
           node-version: 20.x
           registry-url: https://registry.npmjs.org/
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.4
         with:
           fetch-depth: '0'
       - name: Update NPM
@@ -84,7 +76,7 @@ jobs:
     needs: publish-package
     steps:
       ## Checkout so we can apply the new tag
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.4
         with:
           fetch-depth: '0'
 
@@ -93,14 +85,3 @@ jobs:
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
           prerelease: false
-
-  # deploy-pages:
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v2
