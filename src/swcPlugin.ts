@@ -1,7 +1,7 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { getViteConfig } from './utils';
 import { transform as swcTransform } from '@swc/core';
-import { writeFileSync } from 'node:fs';
+import { writeFile } from 'node:fs';
 import type { PluginOption } from 'vite';
 import type { Options as SWCOptions } from '@swc/core';
 
@@ -21,9 +21,9 @@ export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
       if (isPagesBuild()) return getViteConfig(config);
     },
     transform: (code) => (isPagesBuild() ? swcTransform(code, swcDefaults) : null),
-    writeBundle: () => {
+    writeBundle: async () => {
       if (isPagesBuild())
-        writeFileSync(
+        await writeFile(
           'dist/_routes.json',
           JSON.stringify(
             {
@@ -33,7 +33,8 @@ export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
             },
             null,
             2
-          )
+          ),
+          (err) => (err ? console.error(err.message) : null)
         );
     },
   } as PluginOption;
