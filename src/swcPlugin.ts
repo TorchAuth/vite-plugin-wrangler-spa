@@ -5,7 +5,9 @@ import { writeFileSync } from 'node:fs';
 import type { PluginOption } from 'vite';
 import type { Options as SWCOptions } from '@swc/core';
 
-export const swcPlugin = (config?: ResolvedCloudflareSpaConfig) => {
+export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
+  const { allowedApiPaths, excludedApiPaths } = config;
+
   let runCommand: 'build' | 'serve';
   let runMode: string;
   const isPagesBuild = () => runCommand === 'build' && runMode === 'page-function';
@@ -26,8 +28,8 @@ export const swcPlugin = (config?: ResolvedCloudflareSpaConfig) => {
           JSON.stringify(
             {
               version: 1,
-              include: config?.allowedApiPaths || ['/api/*'],
-              exclude: config?.excludedApiPaths || [],
+              include: allowedApiPaths,
+              exclude: excludedApiPaths,
             },
             null,
             2
