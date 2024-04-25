@@ -1,6 +1,7 @@
 import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
+import { UserConfig } from 'vite';
 import { builtinModules } from 'node:module';
 import { splitCookiesString } from 'set-cookie-parser';
 import type { UnstableDevWorker } from 'wrangler';
@@ -118,6 +119,7 @@ export const getViteConfig = (config?: CloudflareSpaConfig) => {
     },
     esbuild: false, // we use SWC to build
     build: {
+      sourcemap: true, // always include sourcemaps
       rollupOptions: {
         external: [...builtinModules, /^node:/],
         input,
@@ -127,5 +129,5 @@ export const getViteConfig = (config?: CloudflareSpaConfig) => {
       emptyOutDir: false,
       ssr: true,
     },
-  };
+  } as UserConfig;
 };

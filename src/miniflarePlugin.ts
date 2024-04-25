@@ -9,15 +9,15 @@ let wranglerDevServer: UnstableDevWorker;
 export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
+  // force wrangler settings that are required for function HMR to work
+  if (!config.wranglerConfig.experimental) config.wranglerConfig.experimental = {};
+  config.wranglerConfig.experimental.liveReload = true;
+  config.wranglerConfig.experimental.testMode = true;
+
   const plugin = {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    config: (_, { command }) => {
-      console.log('config');
-
-      if (command === 'serve') return getViteConfig(config);
-    },
+    config: (_, { command }) => (command === 'serve' ? getViteConfig(config) : null),
     configureServer: async (devServer) => {
-      console.log('server');
       if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
 
       devServer.middlewares.use(async (req, res, next) => {

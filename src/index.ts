@@ -17,16 +17,10 @@ const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
 };
 
 export const viteWranglerSpa = (config: CloudflareSpaConfig = defaultCloudflareSpaConfig) => {
-  // merge configs
   const runtimeConfig: ResolvedCloudflareSpaConfig = {
-    ...defaultCloudflareSpaConfig, // start with defaults
-    ...config, // add user config
+    ...defaultCloudflareSpaConfig,
+    ...config,
   };
-
-  // force wrangler settings that are required for function HMR to work
-  if (!runtimeConfig.wranglerConfig.experimental) runtimeConfig.wranglerConfig.experimental = {};
-  runtimeConfig.wranglerConfig.experimental.liveReload = true;
-  runtimeConfig.wranglerConfig.experimental.testMode = true;
 
   return [miniflarePlugin(runtimeConfig), swcPlugin(runtimeConfig)];
 };

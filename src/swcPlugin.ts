@@ -16,8 +16,6 @@ export const swcPlugin = (config?: ResolvedCloudflareSpaConfig) => {
       runCommand = command;
       runMode = mode;
 
-      console.log('swc');
-
       if (isPagesBuild()) return getViteConfig(config);
     },
     transform: (code) => (isPagesBuild() ? swcTransform(code, swcDefaults) : null),
@@ -44,6 +42,7 @@ export const swcPlugin = (config?: ResolvedCloudflareSpaConfig) => {
 const swcDefaults: SWCOptions = {
   minify: true,
   sourceMaps: true,
+  inlineSourcesContent: true,
   jsc: {
     target: 'esnext',
     parser: {
