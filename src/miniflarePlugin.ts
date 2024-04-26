@@ -4,8 +4,6 @@ import { getViteConfig } from './utils';
 import { makeMiniflareFetch } from './utils';
 import type { PluginOption } from 'vite';
 
-let wranglerDevServer: UnstableDevWorker;
-
 export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
@@ -14,11 +12,17 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   wranglerConfig.experimental.liveReload = true;
   wranglerConfig.experimental.testMode = true;
 
-  const plugin = {
+  let wranglerDevServer: UnstableDevWorker;
+
+  return {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    config: (_, { command }) => (command === 'serve' ? getViteConfig(config) : null),
+    apply: (_, { command }) => command === 'serve',
+    config: () => getViteConfig(config),
     configureServer: async (devServer) => {
-      if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+      if (!wranglerDevServer) {
+        wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+        devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
+      }
 
       devServer.middlewares.use(async (req, res, next) => {
         const { url } = req;
@@ -50,8 +54,6 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
       ],
     },
   } as PluginOption;
-
-  return plugin;
 };
 
 const browserHmrNotification = `
