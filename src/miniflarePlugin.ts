@@ -10,9 +10,9 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
   // force wrangler settings that are required for function HMR to work
-  if (!config.wranglerConfig.experimental) config.wranglerConfig.experimental = {};
-  config.wranglerConfig.experimental.liveReload = true;
-  config.wranglerConfig.experimental.testMode = true;
+  if (!wranglerConfig.experimental) wranglerConfig.experimental = {};
+  wranglerConfig.experimental.liveReload = true;
+  wranglerConfig.experimental.testMode = true;
 
   const plugin = {
     name: 'vite-plugin-wrangler-spa:miniflare',

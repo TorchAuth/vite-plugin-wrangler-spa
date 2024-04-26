@@ -1,6 +1,6 @@
-import { CloudflareSpaConfig } from './CloudflareSpaConfig';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
+import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UserConfig } from 'vite';
 import { builtinModules } from 'node:module';
 import { splitCookiesString } from 'set-cookie-parser';
@@ -108,10 +108,7 @@ export const convertWranglerResponse = (wranglerResponse: Response, res: ServerR
   }
 };
 
-export const getViteConfig = (config?: CloudflareSpaConfig) => {
-  const input = config?.functionEntrypoint || 'functions/index.ts';
-  const external = config?.external || [];
-
+export const getViteConfig = ({ functionEntrypoint, external }: ResolvedCloudflareSpaConfig) => {
   return {
     ssr: {
       external,
@@ -122,7 +119,7 @@ export const getViteConfig = (config?: CloudflareSpaConfig) => {
       sourcemap: true, // always include sourcemaps
       rollupOptions: {
         external: [...builtinModules, /^node:/],
-        input,
+        input: functionEntrypoint,
         preserveEntrySignatures: 'allow-extension',
         output: { entryFileNames: '_worker.js' },
       },
