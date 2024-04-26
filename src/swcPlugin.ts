@@ -8,38 +8,26 @@ import type { Options as SWCOptions } from '@swc/core';
 export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { allowedApiPaths, excludedApiPaths } = config;
 
-  let runCommand: 'build' | 'serve';
-  let runMode: string;
-  const isPagesBuild = () => runCommand === 'build' && runMode === 'page-function';
-
-  const plugin = {
+  return {
     name: 'vite-plugin-wrangler-spa:swc',
-    config: (_, { command, mode }) => {
-      runCommand = command;
-      runMode = mode;
-
-      if (isPagesBuild()) return getViteConfig(config);
-    },
-    transform: (code) => (isPagesBuild() ? swcTransform(code, swcDefaults) : null),
-    writeBundle: async () => {
-      if (isPagesBuild())
-        await writeFile(
-          'dist/_routes.json',
-          JSON.stringify(
-            {
-              version: 1,
-              include: allowedApiPaths,
-              exclude: excludedApiPaths,
-            },
-            null,
-            2
-          ),
-          (err) => (err ? console.error(err.message) : null)
-        );
-    },
+    apply: (_, { command, mode }) => command === 'build' && mode === 'page-function',
+    config: () => getViteConfig(config),
+    transform: (code) => swcTransform(code, swcDefaults),
+    writeBundle: async () =>
+      await writeFile(
+        'dist/_routes.json',
+        JSON.stringify(
+          {
+            version: 1,
+            include: allowedApiPaths,
+            exclude: excludedApiPaths,
+          },
+          null,
+          2
+        ),
+        (err) => (err ? console.error(err.message) : null)
+      ),
   } as PluginOption;
-
-  return plugin;
 };
 
 const swcDefaults: SWCOptions = {

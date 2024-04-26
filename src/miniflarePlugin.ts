@@ -1,35 +1,36 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
-import { convertWranglerResponse, makeWranglerFetch } from './utils';
 import { getViteConfig } from './utils';
+import { makeMiniflareFetch } from './utils';
 import type { PluginOption } from 'vite';
-
-let wranglerDevServer: UnstableDevWorker;
 
 export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
 
   // force wrangler settings that are required for function HMR to work
-  if (!config.wranglerConfig.experimental) config.wranglerConfig.experimental = {};
-  config.wranglerConfig.experimental.liveReload = true;
-  config.wranglerConfig.experimental.testMode = true;
+  if (!wranglerConfig.experimental) wranglerConfig.experimental = {};
+  wranglerConfig.experimental.liveReload = true;
+  wranglerConfig.experimental.testMode = true;
 
-  const plugin = {
+  let wranglerDevServer: UnstableDevWorker;
+
+  return {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    config: (_, { command }) => (command === 'serve' ? getViteConfig(config) : null),
+    apply: (_, { command }) => command === 'serve',
+    config: () => getViteConfig(config),
     configureServer: async (devServer) => {
-      if (!wranglerDevServer) wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+      if (!wranglerDevServer) {
+        wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+        devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
+      }
 
       devServer.middlewares.use(async (req, res, next) => {
         const { url } = req;
 
         if (url === undefined) throw new Error('url is undefined!');
         if (excludedApiPaths.find((x) => new RegExp(x).test(url))) return next();
-        if (allowedApiPaths.find((x) => new RegExp(x).test(url))) {
-          const resp = await makeWranglerFetch(req, wranglerDevServer);
-          convertWranglerResponse(resp, res);
-          return res;
-        }
+        if (allowedApiPaths.find((x) => new RegExp(x).test(url)))
+          return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
 
         return next();
       });
@@ -53,8 +54,6 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
       ],
     },
   } as PluginOption;
-
-  return plugin;
 };
 
 const browserHmrNotification = `
