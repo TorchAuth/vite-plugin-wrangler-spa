@@ -15,8 +15,18 @@ import type { UnstableDevWorker } from 'wrangler';
 // undici types are required to avoid collision between node `Response` and fetch `Response`
 import type { RequestInit, Response } from 'undici';
 
-/** Convert the NodeJS request into a webworker fetch request */
-export const makeWranglerFetch = (req: IncomingMessage, wranglerDevServer: UnstableDevWorker): Promise<Response> => {
+/**
+ * Make a request to the Miniflare server. This returns a mutated version of the `res` object that is passed in.
+ * @param req Node Request object
+ * @param res Node Response object
+ * @param miniflareFetch Fetch function used to access the Miniflare server
+ * @returns
+ */
+export const makeMiniflareFetch = async (
+  req: IncomingMessage,
+  res: ServerResponse<IncomingMessage>,
+  miniflareFetch: UnstableDevWorker['fetch']
+) => {
   const { rawHeaders, method, url } = req;
 
   const headers: Record<string, string> = {};
@@ -38,11 +48,13 @@ export const makeWranglerFetch = (req: IncomingMessage, wranglerDevServer: Unsta
     wranglerReq.duplex = 'half';
   }
 
-  return wranglerDevServer.fetch(url, wranglerReq);
+  const wranglerResp = await miniflareFetch(url, wranglerReq);
+  convertMiniflareResponse(wranglerResp, res);
+  return res;
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
-export const convertWranglerResponse = (wranglerResponse: Response, res: ServerResponse<IncomingMessage>) => {
+export const convertMiniflareResponse = (wranglerResponse: Response, res: ServerResponse<IncomingMessage>) => {
   const headers = Object.fromEntries(wranglerResponse.headers);
   let cookies: string[] = [];
 
