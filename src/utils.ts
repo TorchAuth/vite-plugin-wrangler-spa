@@ -103,15 +103,13 @@ export const convertMiniflareResponse = async (wranglerResponse: Response, res: 
      * we don't have to translate request/response between node and worker types
      */
     const buff = gzipSync(await wranglerResponse.arrayBuffer());
-    const chunks = Math.ceil(buff.length / res.writableHighWaterMark);
 
     res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies, 'content-length': buff.length });
 
-    for (let index = 0; index < chunks; index++) {
-      const start = index * res.writableHighWaterMark;
-      const end = Math.min((index + 1) * res.writableHighWaterMark + 1, buff.length);
-      const chunk = Uint8Array.prototype.slice.call(buff, start, end);
+    for (let start = 0; start < buff.length; start += res.writableHighWaterMark) {
+      const chunk = Uint8Array.prototype.slice.call(buff, start, start + res.writableHighWaterMark);
       res.write(chunk);
+      //TODO: drain needed for big response bodies?
     }
 
     res.end();
