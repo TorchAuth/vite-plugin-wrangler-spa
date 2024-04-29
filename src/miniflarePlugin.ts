@@ -10,7 +10,7 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   // force wrangler settings that are required for function HMR to work
   if (!wranglerConfig.experimental) wranglerConfig.experimental = {};
   wranglerConfig.experimental.liveReload = true;
-  wranglerConfig.experimental.testMode = true;
+  wranglerConfig.experimental.testMode = false;
 
   let wranglerDevServer: UnstableDevWorker;
 
