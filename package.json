@@ -56,7 +56,7 @@
     "set-cookie-parser": "^2.6.0"
   },
   "peerDependencies": {
-    "vite": "^5.2.10",
-    "wrangler": "^3.52.0"
+    "vite": "^5.0.0",
+    "wrangler": "^3.49.0"
   }
 }
