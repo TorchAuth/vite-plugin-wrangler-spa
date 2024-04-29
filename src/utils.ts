@@ -3,6 +3,7 @@ import { Readable } from 'node:stream';
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UserConfig } from 'vite';
 import { builtinModules } from 'node:module';
+import { gzipSync } from 'node:zlib';
 import { splitCookiesString } from 'set-cookie-parser';
 import type { UnstableDevWorker } from 'wrangler';
 
@@ -54,7 +55,7 @@ export const makeMiniflareFetch = async (
 };
 
 /** Convert the webworker fetch response back into a NodeJS response object */
-export const convertMiniflareResponse = (wranglerResponse: Response, res: ServerResponse<IncomingMessage>) => {
+export const convertMiniflareResponse = async (wranglerResponse: Response, res: ServerResponse<IncomingMessage>) => {
   const headers = Object.fromEntries(wranglerResponse.headers);
   let cookies: string[] = [];
 
@@ -64,26 +65,19 @@ export const convertMiniflareResponse = (wranglerResponse: Response, res: Server
     cookies = split;
   }
 
-  res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies });
-
   if (!wranglerResponse.body) {
+    res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies });
     res.end();
     return;
   }
 
   if (wranglerResponse.body.locked) {
+    res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies });
     res.write(
       'Fatal error: Response body is locked. ' +
         `This can happen when the response was already read (for example through 'response.json()' or 'response.text()').`
     );
     res.end();
-    return;
-  }
-
-  const reader = wranglerResponse.body.getReader();
-
-  if (res.destroyed) {
-    reader.cancel();
     return;
   }
 
@@ -93,30 +87,35 @@ export const convertMiniflareResponse = (wranglerResponse: Response, res: Server
 
     // If the reader has already been interrupted with an error earlier,
     // then it will appear here, it is useless, but it needs to be catch.
-    reader.cancel(error).catch(() => {});
     if (error) res.destroy(error);
   };
 
   res.on('close', cancel);
   res.on('error', cancel);
 
-  next();
-  async function next() {
-    try {
-      for (;;) {
-        const { done, value } = await reader.read();
+  try {
+    /**
+     * Since miniflare returns gzip content now, we have to re-wrap the content so the browser doesn't get mad
+     * The alternative is to just pretend miniflare didn't gzip it and erase the content-encoding header,
+     * but this could cause problems later if miniflare continues with gzip
+     *
+     * For now we presume Miniflare intends to gzip content, in production this shouldn't matter anyway because
+     * we don't have to translate request/response between node and worker types
+     */
+    const buff = gzipSync(await wranglerResponse.arrayBuffer());
 
-        if (done) break;
+    res.writeHead(wranglerResponse.status, { ...headers, 'set-cookie': cookies, 'content-length': buff.length });
 
-        if (!res.write(value)) {
-          res.once('drain', next);
-          return;
-        }
-      }
-      res.end();
-    } catch (error) {
-      cancel(error instanceof Error ? error : new Error(String(error)));
+    for (let start = 0; start < buff.length; start += res.writableHighWaterMark) {
+      const chunk = Uint8Array.prototype.slice.call(buff, start, start + res.writableHighWaterMark);
+      res.write(chunk);
+      //TODO: drain needed for big response bodies?
     }
+
+    res.end();
+    return;
+  } catch (error) {
+    cancel(error instanceof Error ? error : new Error(String(error)));
   }
 };
 

@@ -214,4 +214,5 @@ require them.
 
 ### Function Source Maps
 
-`sourceMaps` are automatically created for your compiled functions and placed into `./dist`.
+`sourceMaps` are automatically created for your compiled functions and placed into `./dist`. It is your choice if you want
+to upload these with your bundle. Often the source map can be much larger than the code that generated it.
