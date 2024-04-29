@@ -8,11 +8,13 @@ This solves a major pain point that currently exists, where you cannot work loca
 you are forced to use `preview`. This plugin allows both the React SPA and Cloudflare functions to run with LiveReload
 locally, and at the same time.
 
+- Make requests from the React project directly to the `miniflare` endpoints
+  - Frontend `fetch` requests are automatically proxied to the miniflare server
+    - `http://localhost/api/*` is automatically routed from the frontend to the miniflare server, just like in production
 - Write React code the same as any other Vite project, with LiveReload
 - Cloudflare function code can be written within the configurable `functions` directory
   - This is served in parallel via `miniflare` along with the React SPA code
-  - [Hono](https://hono.dev/top) is the preferred router, but any Cloudflare compatible router could also be used
-- Make requests from the React project to the `miniflare` endpoints
+  - Any Cloudflare compatible router could also be used
 - Full access to Cloudflare local services via `wrangler` configuration
   - D1
   - R2
