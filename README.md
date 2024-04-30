@@ -212,6 +212,47 @@ Also, don't forget to update your `wrangler.toml` file to include any
 [`compatibility_flags`](https://developers.cloudflare.com/workers/wrangler/configuration/#use-runtime-apis-directly), if you
 require them.
 
+### Library Resoluton, Externals, and Conditions
+
+Depending on the modules you use in your function, you may need to make use of none, one, or both of `ssr.external` and
+`resolve.conditions`. Deployment failures are difficult to troubleshoot on Cloudflare, so if it is failing inexplicably you
+may be improperly importing a particular library. This all stems from the fact that Cloudflare functions run on the
+`workerd` runtime and not `node`.
+
+- [ssr.external](https://vitejs.dev/config/ssr-options#ssr-external)
+  - Allow packing of CommonJS modules
+- [resolve.conditions](https://vitejs.dev/config/shared-options#resolve-conditions)
+  - For multi-modules, this ensures you get the correct version for you platform. This depends on the libraries you are
+    using.
+    - `browser`
+    - `workerd`
+  - [NodeJS Conditions Definitions](https://nodejs.org/api/packages.html#community-conditions-definitions)
+
+```ts
+import { defineConfig } from 'vite';
+import { viteWranglerSpa } from '@torchauth/vite-plugin-wrangler-spa';
+import react from '@vitejs/plugin-react-swc';
+import tsconfigPaths from 'vite-tsconfig-paths';
+
+export default defineConfig(() => {
+  return {
+    ssr: {
+      external: ['scrypt-js', '@asteasolutions/zod-to-openapi'], // this will be specific to your application
+    },
+    resolve: {
+      conditions: ['browser'], // safe way to ensure most libraries work
+    },
+    plugins: [
+      tsconfigPaths(),
+      react(),
+      viteWranglerSpa({
+        allowedApiPaths: ['/api/*', '/oauth/*'],
+      }),
+    ],
+  };
+});
+```
+
 ### Function Source Maps
 
 `sourceMaps` are automatically created for your compiled functions and placed into `./dist`. It is your choice if you want
