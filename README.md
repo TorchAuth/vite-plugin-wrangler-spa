@@ -62,7 +62,6 @@ export default defineConfig(() => {
       tsconfigPaths(), // if using paths
       react(),
       viteWranglerSpa({
-        functionEntrypoint: 'functions/index.tsx',
         allowedApiPaths: ['/api/*', '/oauth/*'],
       }),
     ],
