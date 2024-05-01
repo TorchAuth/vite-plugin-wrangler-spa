@@ -61,9 +61,7 @@ export default defineConfig(() => {
     plugins: [
       tsconfigPaths(), // if using paths
       react(),
-      viteWranglerSpa({
-        allowedApiPaths: ['/api/*', '/oauth/*'],
-      }),
+      viteWranglerSpa(),
     ],
   };
 });
