@@ -221,8 +221,7 @@ may be improperly importing a particular library. This all stems from the fact t
 - [resolve.conditions](https://vitejs.dev/config/shared-options#resolve-conditions)
   - For multi-modules, this ensures you get the correct version for you platform. This depends on the libraries you are
     using.
-    - `browser`
-    - `workerd`
+    - `browser` or `workerd` should both work
   - [NodeJS Conditions Definitions](https://nodejs.org/api/packages.html#community-conditions-definitions)
 
 ```ts
