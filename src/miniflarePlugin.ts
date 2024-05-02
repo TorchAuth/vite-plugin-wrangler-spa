@@ -29,10 +29,8 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
         if (url === undefined) throw new Error('url is undefined!');
 
         if (excludedApiPaths.find((x) => doesPathMatch(x, url))) return next();
-        if (allowedApiPaths.find((x) => doesPathMatch(x, url))) {
-          console.log('path match');
+        if (allowedApiPaths.find((x) => doesPathMatch(x, url)))
           return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
-        }
 
         return next();
       });

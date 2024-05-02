@@ -144,8 +144,10 @@ export const getViteConfig = ({ functionEntrypoint, external }: ResolvedCloudfla
  * Check if supplied path matches the regex value.
  *
  * We strip off wildcards to avoid partial matches, and force searching from only the start of the path.
+ *
+ * This is an imperfect system that will likely need improvement. A simple regex may not be able to capture all paths easily.
  * @param value The route path to match
  * @returns True if path matches
  */
 export const doesPathMatch = (value: string, currentPath: string) =>
-  new RegExp(`^${value.replace('*', '')}`).test(currentPath);
+  new RegExp(`^${value.replace('*', '/*')}`).test(currentPath); // splice additional '/' when wildcard present to avoid partial matches
