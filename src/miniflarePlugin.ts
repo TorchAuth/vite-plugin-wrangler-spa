@@ -1,6 +1,6 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
 import { UnstableDevWorker, unstable_dev } from 'wrangler';
-import { getViteConfig } from './utils';
+import { doesPathMatch, getViteConfig } from './utils';
 import { makeMiniflareFetch } from './utils';
 import type { PluginOption } from 'vite';
 
@@ -26,11 +26,13 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
 
       devServer.middlewares.use(async (req, res, next) => {
         const { url } = req;
-
         if (url === undefined) throw new Error('url is undefined!');
-        if (excludedApiPaths.find((x) => new RegExp(x).test(url))) return next();
-        if (allowedApiPaths.find((x) => new RegExp(x).test(url)))
+
+        if (excludedApiPaths.find((x) => doesPathMatch(x, url))) return next();
+        if (allowedApiPaths.find((x) => doesPathMatch(x, url))) {
+          console.log('path match');
           return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
+        }
 
         return next();
       });

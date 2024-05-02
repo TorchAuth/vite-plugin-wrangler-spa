@@ -139,3 +139,13 @@ export const getViteConfig = ({ functionEntrypoint, external }: ResolvedCloudfla
     },
   } as UserConfig;
 };
+
+/**
+ * Check if supplied path matches the regex value.
+ *
+ * We strip off wildcards to avoid partial matches, and force searching from only the start of the path.
+ * @param value The route path to match
+ * @returns True if path matches
+ */
+export const doesPathMatch = (value: string, currentPath: string) =>
+  new RegExp(`^${value.replace('*', '')}`).test(currentPath);
