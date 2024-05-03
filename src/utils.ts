@@ -149,5 +149,12 @@ export const getViteConfig = ({ functionEntrypoint, external }: ResolvedCloudfla
  * @param value The route path to match
  * @returns True if path matches
  */
-export const doesPathMatch = (value: string, currentPath: string) =>
-  new RegExp(`^${value.replace('*', '/*')}`).test(currentPath); // splice additional '/' when wildcard present to avoid partial matches
+export const doesPathMatch = (matcher: string, currentPath: string) => {
+  // default explicit path /api/ || /api
+  let sanitizedMatcher = `^${matcher}$`;
+
+  // splice additional '/' when wildcard present to avoid partial matches like /apis for /api/*
+  if (matcher.endsWith('*')) sanitizedMatcher = `^${matcher.replace('*', '/*')}`; // wildcard /api/*
+
+  return new RegExp(sanitizedMatcher).test(currentPath);
+};
