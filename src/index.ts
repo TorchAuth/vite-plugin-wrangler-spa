@@ -8,6 +8,7 @@ const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
   functionEntrypoint: 'functions/index.ts',
   external: [],
   wranglerConfig: {
+    port: 55554,
     logLevel: 'log',
     experimental: {
       disableExperimentalWarning: true, //disable because it's annoying
