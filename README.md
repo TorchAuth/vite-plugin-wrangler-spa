@@ -99,6 +99,7 @@ All settings are optional, with the default being used when no other value is se
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | [see Wrangler documentation](https://github.com/cloudflare/workers-sdk/blob/c81fa65cbc4b1749ab31afb114cc3cb40e22fef9/packages/wrangler/src/api/dev.ts#L13) |
 | wranglerConfigPath |              Location of your `wrangler.toml` file for usage in setting up Wrangler local services               |                                                                                                                                            `wrangler.toml` |
 | external           |                                 Any Function packages that should not be bundled                                 |                                                                                                                                                       `[]` |
+| swcConfig          |                                    Pass through for SWC configuration objects                                    |                                                                                           [See SWC documentation](https://swc.rs/docs/configuration/swcrc) |
 
 ## API Endpoints
 

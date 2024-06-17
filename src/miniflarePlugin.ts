@@ -19,21 +19,23 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
     apply: (_, { command }) => command === 'serve',
     config: () => getViteConfig(config),
     configureServer: async (devServer) => {
-      if (!wranglerDevServer) {
-        wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
-        devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
-      }
+      return async () => {
+        if (!wranglerDevServer) {
+          wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+          devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
+        }
 
-      devServer.middlewares.use(async (req, res, next) => {
-        const { url } = req;
-        if (url === undefined) throw new Error('url is undefined!');
+        devServer.middlewares.use(async (req, res, next) => {
+          const { url } = req;
+          if (url === undefined) throw new Error('url is undefined!');
 
-        if (excludedApiPaths.find((x) => doesPathMatch(x, url))) return next();
-        if (allowedApiPaths.find((x) => doesPathMatch(x, url)))
-          return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
+          if (excludedApiPaths.find((x) => doesPathMatch(x, url))) return next();
+          if (allowedApiPaths.find((x) => doesPathMatch(x, url)))
+            return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
 
-        return next();
-      });
+          return next();
+        });
+      };
     },
     handleHotUpdate: async (ctx) => {
       if (ctx.file.includes(functionEntrypoint.split('/')[0]))

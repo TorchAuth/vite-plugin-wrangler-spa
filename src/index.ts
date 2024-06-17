@@ -14,6 +14,28 @@ const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
     },
   },
   wranglerConfigPath: 'wrangler.toml',
+  swcConfig: {
+    minify: true,
+    sourceMaps: true,
+    inlineSourcesContent: true,
+    jsc: {
+      target: 'esnext',
+      parser: {
+        tsx: true,
+        syntax: 'typescript',
+        decorators: true,
+      },
+      transform: {
+        decoratorMetadata: true,
+        legacyDecorator: true,
+      },
+      minify: {
+        compress: true,
+        mangle: true,
+      },
+      loose: true,
+    },
+  },
 };
 
 export const viteWranglerSpa = (config: CloudflareSpaConfig = defaultCloudflareSpaConfig) => {
