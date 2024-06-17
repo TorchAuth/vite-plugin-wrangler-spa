@@ -1,4 +1,5 @@
 import { UnstableDevOptions } from 'wrangler';
+import type { Options as SWCOptions } from '@swc/core';
 
 export type CloudflareSpaConfig = Partial<ResolvedCloudflareSpaConfig>;
 
@@ -47,7 +48,7 @@ export type ResolvedCloudflareSpaConfig = {
    *
    * Set up for things such as D1, R2, or KV can occur here, but setup via wrangler.toml is easier
    *
-   * See wrangler documentation for more information
+   * [see Wrangler documentation](https://github.com/cloudflare/workers-sdk/blob/c81fa65cbc4b1749ab31afb114cc3cb40e22fef9/packages/wrangler/src/api/dev.ts#L13)
    */
   wranglerConfig: UnstableDevOptions;
 
@@ -57,4 +58,11 @@ export type ResolvedCloudflareSpaConfig = {
    * **default: 'wrangler.toml'**
    */
   wranglerConfigPath: string;
+
+  /**
+   * Configuration for SWC compilation
+   *
+   * [See SWC doccumentation for more information](https://swc.rs/docs/configuration/swcrc)
+   */
+  swcConfig: SWCOptions;
 };
