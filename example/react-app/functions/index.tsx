@@ -15,7 +15,7 @@ const route = app
     ),
     (c) => {
       return c.json({
-        test: true,
+        test: false,
       });
     }
   )
@@ -23,7 +23,7 @@ const route = app
     return c.html(
       <html>
         <body>
-          <div>HERE's Some content!!</div>
+          <div>HERE's Some content</div>
         </body>
       </html>
     );
