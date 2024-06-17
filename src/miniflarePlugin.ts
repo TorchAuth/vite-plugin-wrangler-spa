@@ -17,6 +17,7 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
     apply: (_, { command }) => command === 'serve',
     config: () => getViteConfig(config),
     configureServer: async (devServer) => {
+      // miniflare must be registered before Vite middleware
       const wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
       devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
 
