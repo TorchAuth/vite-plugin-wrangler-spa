@@ -52,7 +52,7 @@
     "undici": "^6.15.0"
   },
   "dependencies": {
-    "@swc/core": "^1.4.17",
+    "@swc/core": "^1.6.1",
     "set-cookie-parser": "^2.6.0"
   },
   "peerDependencies": {
