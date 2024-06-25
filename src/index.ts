@@ -1,4 +1,5 @@
 import { CloudflareSpaConfig, ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
+import { mergeConfig } from 'vite';
 import { miniflarePlugin } from './miniflarePlugin';
 import { swcPlugin } from './swcPlugin';
 
@@ -40,10 +41,7 @@ const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
 };
 
 export const viteWranglerSpa = (config: CloudflareSpaConfig = defaultCloudflareSpaConfig) => {
-  const runtimeConfig: ResolvedCloudflareSpaConfig = {
-    ...defaultCloudflareSpaConfig,
-    ...config,
-  };
+  const runtimeConfig = mergeConfig(defaultCloudflareSpaConfig, config, true) as ResolvedCloudflareSpaConfig;
 
   return [miniflarePlugin(runtimeConfig), swcPlugin(runtimeConfig)];
 };
