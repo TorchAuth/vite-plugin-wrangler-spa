@@ -3,7 +3,7 @@ import { miniflarePlugin } from './miniflarePlugin';
 import { swcPlugin } from './swcPlugin';
 
 const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
-  allowedApiPaths: ['/api/*'],
+  allowedApiPaths: ['^/api/*'],
   excludedApiPaths: [],
   functionEntrypoint: 'functions/index.ts',
   external: [],

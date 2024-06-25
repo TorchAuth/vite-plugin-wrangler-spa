@@ -1,6 +1,5 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
-import { UnstableDevWorker, unstable_dev } from 'wrangler';
-import { getViteConfig } from './utils';
+import { unstable_dev } from 'wrangler';
 import type { PluginOption } from 'vite';
 
 export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
@@ -11,21 +10,18 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
   wranglerConfig.experimental.liveReload = true;
   wranglerConfig.experimental.testMode = false;
 
-  let wranglerDevServer: UnstableDevWorker;
-
   return {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    apply: (_, { command }) => command === 'serve',
+    apply: 'serve',
     configResolved: async (viteConfig) => {
       viteConfig.server.proxy = allowedApiPaths.reduce(
         (acc, curr) => ({ ...acc, [curr]: `http://127.0.0.1:${wranglerConfig.port}` }),
         {}
       );
     },
-    config: () => getViteConfig(config),
     configureServer: async (devServer) => {
       return async () => {
-        wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+        const wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
         devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
       };
     },

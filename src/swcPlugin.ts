@@ -18,8 +18,8 @@ export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
         JSON.stringify(
           {
             version: 1,
-            include: allowedApiPaths,
-            exclude: excludedApiPaths,
+            include: allowedApiPaths.map((x) => x.replace('^', '')),
+            exclude: excludedApiPaths.map((x) => x.replace('^', '')),
           },
           null,
           2
