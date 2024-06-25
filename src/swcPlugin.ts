@@ -1,8 +1,30 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
-import { getViteConfig } from './utils';
+import { UserConfig } from 'vite';
+import { builtinModules } from 'node:module';
 import { transform as swcTransform } from '@swc/core';
 import { writeFile } from 'node:fs';
 import type { PluginOption } from 'vite';
+
+const getViteConfig = ({ functionEntrypoint, external }: ResolvedCloudflareSpaConfig) => {
+  return {
+    ssr: {
+      external,
+      noExternal: true,
+    },
+    esbuild: false, // we use SWC to build
+    build: {
+      sourcemap: true, // always include sourcemaps
+      rollupOptions: {
+        external: [...builtinModules, /^node:/],
+        input: functionEntrypoint,
+        preserveEntrySignatures: 'allow-extension',
+        output: { entryFileNames: '_worker.js' },
+      },
+      emptyOutDir: false,
+      ssr: true,
+    },
+  } as UserConfig;
+};
 
 export const swcPlugin = (config: ResolvedCloudflareSpaConfig) => {
   const { allowedApiPaths, excludedApiPaths, swcConfig } = config;
