@@ -17,8 +17,6 @@ function App() {
       setRemote(await resp.text());
     }
 
-    fetch('/apis/test');
-
     fetchStuff();
   }, []);
 

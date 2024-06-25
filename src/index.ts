@@ -3,11 +3,12 @@ import { miniflarePlugin } from './miniflarePlugin';
 import { swcPlugin } from './swcPlugin';
 
 const defaultCloudflareSpaConfig: ResolvedCloudflareSpaConfig = {
-  allowedApiPaths: ['/api/*'],
+  allowedApiPaths: ['^/api/*'],
   excludedApiPaths: [],
   functionEntrypoint: 'functions/index.ts',
   external: [],
   wranglerConfig: {
+    port: 55554,
     logLevel: 'log',
     experimental: {
       disableExperimentalWarning: true, //disable because it's annoying

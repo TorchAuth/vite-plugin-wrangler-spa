@@ -93,7 +93,7 @@ All settings are optional, with the default being used when no other value is se
 
 | Name               |                                                   Description                                                    |                                                                                                                                                    Default |
 | ------------------ | :--------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                                                                                                                                                `["/api/*]` |
+| allowedApiPaths    |             These are url paths that should be directed to the Cloudflare function, and not the SPA.             |                                                                                                                                               `["^/api/*]` |
 | excludedApiPaths   | These are url paths that should **not** be directed to the Cloudflare function, and will always route to the SPA |                                                                                                                                                       `[]` |
 | functionEntrypoint |            The file (/tsx?/) that will be used as the entry point for the Cloudflare Pages functions.            |                                                                                                                                       `functions/index.ts` |
 | wranglerConfig     |                                 Pass through for Wrangler configuration objects                                  | [see Wrangler documentation](https://github.com/cloudflare/workers-sdk/blob/c81fa65cbc4b1749ab31afb114cc3cb40e22fef9/packages/wrangler/src/api/dev.ts#L13) |
@@ -125,21 +125,22 @@ Any updates to the API will trigger a full refresh in the browser window, as wel
 
 ### Allowed/Excluded Api Paths
 
-**Excluded api paths take precedence over allowed api paths**
+**`excludedApiPaths` are not utilized in local development and are only used in \_routes.json as an escape hatch**
+
+| Path            |               Result                |
+| --------------- | :---------------------------------: |
+| `^/some`        |             exact match             |
+| `^/some/*`      |   match all routes with `/some/`    |
+| `^/some/path`   |             exact match             |
+| `^/some/path/*` | match all routes with `/some/path/` |
 
 The `allowedApiPaths` and `excludedApiPaths` plugin settings will determine which routes get routed to the frontend or
 backend.
 
-| Path           |               Result                |
-| -------------- | :---------------------------------: |
-| `/some`        |             exact match             |
-| `/some/*`      |   match all routes with `/some/`    |
-| `/some/path`   |             exact match             |
-| `/some/path/*` | match all routes with `/some/path/` |
-
-Strings should be in the format of a url fragment `/some/path`. Asterisks can be used at the end of a path (`/some/path/*`)
-as a wild card to catch all routes. This string is applied directly to the `_routes.json` file, more elaborate RegExs will
-not work correctly once deployed to Cloudflare.
+- Paths can either be RegEx, or plain. See
+  [Vite documentation for specific usage](https://vitejs.dev/config/server-options#server-proxy).
+- In most cases, you will want to utilize a start-of-line caret and a astrix suffix.
+- These strings are applied to the generated `_routes.json` file with carets removed.
 
 [See Cloudflare \_routes.json documentation for more information.](https://developers.cloudflare.com/pages/functions/routing/#create-a-_routesjson-file)
 
@@ -212,12 +213,12 @@ require them.
 
 ### Library Resoluton, Externals, and Conditions
 
-Depending on the modules you use in your function, you may need to make use of none, one, or both of `ssr.external` and
-`resolve.conditions`. Deployment failures are difficult to troubleshoot on Cloudflare, so if it is failing inexplicably you
-may be improperly importing a particular library. This all stems from the fact that Cloudflare functions run on the
-`workerd` runtime and not `node`.
+Depending on the modules you use in your function, you may need to make use of none, one, or both of
+`viteWranglerSpa.external` and `resolve.conditions`. Deployment failures are difficult to troubleshoot on Cloudflare, so if
+it is failing inexplicably you may be improperly importing a particular library. This all stems from the fact that
+Cloudflare functions run on the `workerd` runtime and not `node`.
 
-- [ssr.external](https://vitejs.dev/config/ssr-options#ssr-external)
+- [viteWranglerSpa.external](https://vitejs.dev/config/ssr-options#ssr-external)
   - Allow packing of CommonJS modules
 - [resolve.conditions](https://vitejs.dev/config/shared-options#resolve-conditions)
   - For multi-modules, this ensures you get the correct version for you platform. This depends on the libraries you are
@@ -233,9 +234,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(() => {
   return {
-    ssr: {
-      external: ['scrypt-js', '@asteasolutions/zod-to-openapi'], // this will be specific to your application
-    },
     resolve: {
       conditions: ['browser'], // safe way to ensure most libraries work
     },
@@ -244,6 +242,7 @@ export default defineConfig(() => {
       react(),
       viteWranglerSpa({
         allowedApiPaths: ['/api/*', '/oauth/*'],
+        external: ['scrypt-js', '@asteasolutions/zod-to-openapi'], // this will be specific to your application
       }),
     ],
   };

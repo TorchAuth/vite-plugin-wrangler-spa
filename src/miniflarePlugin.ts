@@ -1,11 +1,9 @@
 import { ResolvedCloudflareSpaConfig } from './CloudflareSpaConfig';
-import { doesPathMatch, getViteConfig } from './utils';
-import { makeMiniflareFetch } from './utils';
 import { unstable_dev } from 'wrangler';
 import type { PluginOption } from 'vite';
 
 export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
-  const { functionEntrypoint, wranglerConfig, excludedApiPaths, allowedApiPaths } = config;
+  const { functionEntrypoint, wranglerConfig, allowedApiPaths } = config;
 
   // force wrangler settings that are required for function HMR to work
   if (!wranglerConfig.experimental) wranglerConfig.experimental = {};
@@ -14,23 +12,18 @@ export const miniflarePlugin = (config: ResolvedCloudflareSpaConfig) => {
 
   return {
     name: 'vite-plugin-wrangler-spa:miniflare',
-    apply: (_, { command }) => command === 'serve',
-    config: () => getViteConfig(config),
+    apply: 'serve',
+    configResolved: async (viteConfig) => {
+      viteConfig.server.proxy = allowedApiPaths.reduce(
+        (acc, curr) => ({ ...acc, [curr]: `http://127.0.0.1:${wranglerConfig.port}` }),
+        {}
+      );
+    },
     configureServer: async (devServer) => {
-      // miniflare must be registered before Vite middleware
-      const wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
-      devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
-
-      devServer.middlewares.use(async (req, res, next) => {
-        const { url } = req;
-        if (url === undefined) throw new Error('url is undefined!');
-
-        if (excludedApiPaths.find((x) => doesPathMatch(x, url))) return next();
-        if (allowedApiPaths.find((x) => doesPathMatch(x, url)))
-          return await makeMiniflareFetch(req, res, wranglerDevServer.fetch);
-
-        return next();
-      });
+      return async () => {
+        const wranglerDevServer = await unstable_dev(functionEntrypoint, wranglerConfig);
+        devServer.httpServer?.on('close', async () => await wranglerDevServer.stop());
+      };
     },
     handleHotUpdate: async (ctx) => {
       if (ctx.file.includes(functionEntrypoint.split('/')[0]))

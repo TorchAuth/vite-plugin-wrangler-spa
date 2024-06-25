@@ -8,7 +8,7 @@ export default defineConfig(() => {
       react(),
       viteWranglerSpa({
         functionEntrypoint: 'functions/index.tsx',
-        allowedApiPaths: ['/api/*', '/oauth/*'],
+        allowedApiPaths: ['^/api/*', '^/oauth/*'],
       }),
     ],
   };

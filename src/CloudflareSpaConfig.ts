@@ -24,13 +24,15 @@ export type ResolvedCloudflareSpaConfig = {
    *
    * In production, a _routes.json file will be used with these values set to the 'excluded' property
    *
+   * These values are ignored during local development.
+   *
    * **default: []**
    */
   excludedApiPaths: string[];
 
   /**
    * Any modules that should not explicitly be bundled with the Pages Function _worker.js.
-   * Commonly used for misbehaving modules that don't bundle well.
+   * Commonly used for misbehaving CJS modules that don't bundle well.
    */
   external: string[];
 
