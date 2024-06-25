@@ -1,6 +1,6 @@
 {
   "name": "@torchauth/vite-plugin-wrangler-spa",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Vite plugin for creating Cloudflare Pages SPA applications with API endpoints",
   "author": "Bruce Harrison",
   "license": "MIT",
